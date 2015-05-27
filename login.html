@@ -1,0 +1,75 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<base href="/">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Trading Desk</title>
+	<meta name="description" content="" />
+	<link rel="shortcut icon" href="#" />
+	<link href='http://fonts.googleapis.com/css?family=Alegreya+Sans' rel='stylesheet' type='text/css'> 
+	<meta name="viewport" content="width=device-width"/>
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery-1.11.0.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery.placeholder.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery-ui-1.10.3.min.js"></script>
+	<script rel="stylesheet" href="http://open.mediamath.com/demo/tradingdesk/assets/_js/jqueryui/custom/jquery-ui-1.10.4.custom.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery-ui-1.10.4.custom.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/spin.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/chosen/chosen.jquery.min.js"></script>
+	<script src="http://code.highcharts.com/highcharts.js"></script>
+	<script src="http://code.highcharts.com/highcharts-more.js"></script>
+	<!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<link rel="stylesheet" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/bootstrap.css" />
+	<link rel="stylesheet" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/jquery.selectBoxIt.css" />
+	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/jqueryui/custom/jquery-ui-1.10.4.custom.css" />
+	<link rel="stylesheet" type="text/css" href="accuen-trader/common.css"/>
+	<link rel="stylesheet" type="text/css" href="accuen-trader/demo.css"/>
+	<link rel="stylesheet" type="text/css" href="accuen-trader/menu.css" />
+	<!-- <link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/common.css"/>
+	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/demo.css"/>
+	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/menu.css" /> -->
+  	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/chosen/chosen.min.css">
+</head>
+<link rel="stylesheet" type="text/css" media="screen" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/browser-detection.css" />
+<script type="text/javascript" src="http://open.mediamath.com/demo/tradingdesk/assets/_js/browser-detection.js"></script>
+<script type="text/javascript">
+<!--
+var notSupportedBrowsers = [{'os': 'Any', 'browser': 'MSIE', 'version': 8}, {'os': 'Any', 'browser': 'Firefox', 'version': 15}];
+var displayPoweredBy = false;
+var noticeLang = 'custom';
+var noticeLangCustom = {
+"title": "Outdated Browser Detected",
+"notice": "<br />We have detected that you are using an outdated browser.<br />You may continue, however some features of this website will cause unexpected errors. ",
+"selectBrowser": "Use the links below to download a new browser or upgrade your existing browser.",
+"remindMeLater": "Remind me later",
+"neverRemindAgain": "No, don't remind me again" };
+// -->
+</script>
+
+<div class="container">
+	<div id="actual_login">
+		<div id="border_line"></div>
+		<div id="login_section">
+			<div id="top_line" style="background-color: #eeb700;">
+				<!-- <div class="logo" id="logoHead">
+					<img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/logo.png">
+				</div> -->
+				<img id="accuen-logo" src="http://www.visualdna.com/wp-content/uploads/2014/09/ACCUEN_logo_big1.png" style="height: 115px;">
+				<div class="text">
+					trading <span>platform</span>
+				</div>
+			</div><div id="bottom_line" style="background-color: rgba(24, 18, 0, 0.33);">
+				<form action="accuen-trader/traders.html" method="post" accept-charset="utf-8" style="margin-top: 30px">					
+					<input type="text" placeholder="email / username" name="email" autocomplete="off" id="email" value="">
+					<input type="password" placeholder="password" name="password" autocomplete="off" id="password">
+					<input type="submit" name="loginSubmit" value="Login" class="submit_but">
+				</form>
+				<!-- <a href="#">forgotten password?</a> -->
+				<div id="errorLogin"></div>
+			</div>
+		</div>
+	</div>
+</div>
+		</div>
+	</body>
+</html>

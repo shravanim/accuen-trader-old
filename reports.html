@@ -1,0 +1,812 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<base href="/">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Trading Desk</title>
+	<meta name="description" content="" />
+	<link rel="shortcut icon" href="#" />
+	<link href='http://fonts.googleapis.com/css?family=Alegreya+Sans' rel='stylesheet' type='text/css'> 
+	<meta name="viewport" content="width=device-width"/>
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery-1.11.0.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery.placeholder.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery-ui-1.10.3.min.js"></script>
+	<script rel="stylesheet" href="http://open.mediamath.com/demo/tradingdesk/assets/_js/jqueryui/custom/jquery-ui-1.10.4.custom.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery-ui-1.10.4.custom.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/spin.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/chosen/chosen.jquery.min.js"></script>
+	<script src="http://code.highcharts.com/highcharts.js"></script>
+	<script src="http://code.highcharts.com/highcharts-more.js"></script>
+	<!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<link rel="stylesheet" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/bootstrap.css" />
+	<link rel="stylesheet" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/jquery.selectBoxIt.css" />
+	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/jqueryui/custom/jquery-ui-1.10.4.custom.css" />
+	<link rel="stylesheet" type="text/css" href="accuen-trader/common.css"/>
+	<link rel="stylesheet" type="text/css" href="accuen-trader/demo.css"/>
+	<link rel="stylesheet" type="text/css" href="accuen-trader/menu.css" />
+	<!-- <link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/common.css"/>
+	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/demo.css"/>
+	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/menu.css" /> -->
+  	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/chosen/chosen.min.css">
+</head>
+<script>
+$(document).ready(function(){
+	var config = {
+      '.chosen-select'  : {width: '100%', disable_search_threshold:10},
+      '.chosen-select-deselect'  : {allow_single_deselect:true},
+      '.chosen-select-no-single' : {disable_search_threshold:10},
+      '.chosen-select-campaign-no-results': {no_results_text:'nothing found.'}
+    }
+
+    for (var selector in config)
+    {
+    	$(selector).chosen(config[selector]);
+    }
+
+    $( "input.datepicker" ).datepicker({dateFormat: 'd/m/yy'});
+
+
+	$('input, textarea').placeholder();
+
+	$('#search').submit(function(){
+		event.preventDefault();
+		var search = encodeURIComponent($('#search_criteria').val());
+		if (search.length == 0){search = '0';}
+
+		var current_url = 'http://open.mediamath.com/demo/tradingdesk/reports/campaign_statistics';
+		var parts = current_url.split('/');
+		var length = parts.length;
+		var new_url = current_url.replace(parts[length-2]+'/'+parts[length-1],'');
+		window.location = new_url + '0/' + search.replace("'",'%27'); 
+	});
+
+	$('textarea#targetting').bind({
+		focus: function(){
+			$(this).animate({
+				width: "300px",
+				height: "110px"
+			});
+		},
+		focusout: function(){
+			$(this).animate({
+				width: "186px",
+				height: "64px"
+			});
+		}
+	});
+
+	$('textarea#ad_server_tags').bind({
+		focus: function(){
+			$(this).animate({
+				width: "500px",
+				height: "250px"
+			});
+		},
+		focusout: function(){
+			$(this).animate({
+				width: "186px",
+				height: "64px"
+			});
+		}
+	});
+
+});
+
+var first_load = true;
+function show_ajax_loader(show)
+{		
+		var opts = {
+		  lines: 10, // The number of lines to draw
+		  length: 0, // The length of each line
+		  width: 5, // The line thickness
+		  radius: 13, // The radius of the inner circle
+		  corners: 1, // Corner roundness (0..1)
+		  rotate: 0, // The rotation offset
+		  direction: 1, // 1: clockwise, -1: counterclockwise
+		  color: '#fff', // #rgb or #rrggbb or array of colors
+		  speed: 0.8, // Rounds per second
+		  trail: 15, // Afterglow percentage
+		  shadow: false, // Whether to render a shadow
+		  hwaccel: false, // Whether to use hardware acceleration
+		  className: 'spinner', // The CSS class to assign to the spinner
+		  zIndex: 2e9, // The z-index (defaults to 2000000000)
+		  top: '120', // Top position relative to parent in px
+		  left: '50px' // Left position relative to parent in px
+		};
+		
+		var target = document.getElementById('ajax_loader');
+		
+	if (show)
+	{
+		if(first_load){var spinner = new Spinner(opts).spin(target); first_load=false;}
+		else{spinner;}
+
+		$("#dialog-ajax").dialog({
+	      	modal: true,
+	      	closeOnEscape: false,
+	      	draggable: false,
+	      	dialogClass: 'ajax-loading',
+			width: 250,
+			height: 150,
+			resizable: false
+	    });
+	}
+	else
+	{
+		$("#dialog-ajax").dialog('close');
+	}
+}
+
+$(document).ready(function(){
+	$(".lines").click(function(){
+		$("#line-results").toggle();
+	});
+	$(".lines").blur(function(){
+    	$("#line-results").css( "display", "none" );
+	});
+
+	$("#bar").click(function(){
+		$("#bar-results").toggle();
+	});
+	$("#bar").blur(function(){
+    	$("#bar-results").css( "display", "none" );
+	});
+
+	$(".select_download_type_chosen").click(function(){
+		$("#download-type-results").toggle();
+	});
+	$(".select_download_type_chosen").blur(function(){
+    	$("#download-type-results").css( "display", "none" );
+	});
+});
+
+
+</script>
+
+<div id="top_heading">
+	<div class="container960">
+			<!-- <div class="" id="logoHead">
+			</div> -->
+			<img id="accuen-logo" src="http://www.visualdna.com/wp-content/uploads/2014/09/ACCUEN_logo_big1.png">
+
+			
+			<div class="" id="userType">
+				<div id="cssmenu">
+					<ul>
+					    <li class=""><a href="accuen-trader/traders.html"><span>Home</span></a></li>
+					    <li class="has-sub"><a href="javascript: void(0);"><span>Campaigns</span></a>
+					        <ul>
+					        						        	<li><a href="accuen-trader/pending.html"><span>Pending</span></a></li>
+					        	<li><a href="accuen-trader/accepted.html"><span>Accepted</span></a></li>
+					        	<li class="last"><a href="accuen-trader/rejected.html"><span>Rejected</span></a></li>
+					        </ul>
+					   	</li>
+					    <li class="active ">
+					    	<a href="javascript: void(0);"><span>Reports</span></a>
+
+					    	<ul>
+					    		<li> <a href="accuen-trader/reports.html"> <span>Statistics</span> </a> </li>
+					    							    	</ul>
+
+					    </li>
+					    					    <li class="has-sub"><a href="javascript: void(0);"><span>Administration</span></a>
+							<ul>
+					        	<li><a href="accuen-trader/createUsers.html"><span>Create Users</span></a></li>
+					        	<li><a href="accuen-trader/editUsers.html"><span>Edit Users</span></a></li>
+					        	<li><a href="accuen-trader/agencies.html"><span>Agencies</span></a></li>
+					        						        	<li><a href="accuen-trader/strategy.html"><span>Strategy Templates</span></a></li>
+					        	<li class="last"><a href="accuen-trader/targeting.html"><span>Targeting Templates</span></a></li>
+					        </ul>
+					    </li>
+					    					    <li class="last"><a href="accuen-trader/login.html">Logout</a></li>
+					</ul>
+				</div>
+			</div>
+				</div>
+</div>
+<div class="breadcrumb">
+	<div class="container960">
+		<img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/user.png"/><h1>Reports</h1>	</div>
+</div>
+<div class="container960">
+	<div id="dialog-ajax" title="Loading" style="display: none; text-align: center; background-color: #38617f;">
+		<div id="ajax_loader" style="float:left; width: 45%; margin: 65px 0 0 0px;">
+		    <!-- <img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/ajax_loader.gif" /> -->
+	    </div>
+	    <div style="float: left; margin: 50px 0px 0px 0px; color: #69889f; font-size: 22px;">
+	    	Loading
+		</div>
+	</div>
+<div class="reports_page">
+	<div class="select-options">
+		<select class="choose_advertiser chosen-select-advertiser" data-placeholder="Select an Advertiser">
+			<option value=""></option>
+							<option value="CDONGroup-Nelly.com" id="20">CDONGroup-Nelly.com</option>
+							<option value="Example Advertiser" id="18">Example Advertiser</option>
+							<option value="WWF" id="19">WWF</option>
+					</select>
+		<select class="choose_campaign chosen-select-campaign" id="choose_campaign" data-placeholder="No campaign"><option value="0"></option></select>
+	</div>
+	<div class="choose_date_range">
+		<form id="date_range" action="">
+			<ul>
+				<li>
+					Start Date
+					<input type="text" id="start_date" value=""/>
+					<span><img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/datepicker.png" id="start_date_btn"></span>
+				</li>
+				<li>
+					End Date
+					<input type="text" id="end_date"  value=""/>
+					<span><img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/datepicker.png" id="end_date_btn"></span>
+				</li>
+				<li>
+					<input type="button" value="Update" id="update_range">
+				</li>
+			</ul>
+		</form>
+	</div>
+	<div class="clear"></div>
+	<div id="chart_div" style="width: 960px; height: 192px;">
+			<img src="accuen-trader/impressions_report.png" style="width: 960px; margin-top: 18px;" >
+		</div>	
+	<div class="info_panel" >
+		<div class="info_box" style="color: #043960;">
+			<h2>Campaign Info</h2>
+			<table style="border-right: 1.5px solid #eeb700;">
+				<tbody id="campaign_info">
+					<tr><td>Campaign Budget (&pound;):</td><td>0.00</td></tr>
+					<tr><td>CPM sold (&pound;):</td><td>0</td></tr>
+					<tr><td>Impressions:</td><td>0</td></tr>
+					<tr><td>CPA target:</td><td>0.00</td></tr>
+					<tr><td>Campaign start:</td><td>null</td></tr>
+					<tr><td>Campaign end: </td><td>null</td></tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="info_box" style="color: #043960;">
+			<h2>Results</h2>
+			<table class="date_range_info_table" style="border-right: 1.5px solid #eeb700;">
+				<tbody class="date_range_info">
+					<tr><td>Impression:</td><td>0</td></tr>
+					<tr><td>Clicks:</td><td>0</td></tr>
+					<tr><td>Conversions:</td><td>0</td></tr>
+					<tr><td>eCPA:</td><td>0</td></tr>
+					<tr><td>eCPM:</td><td>0</td></tr>
+					<tr><td>Conversions per 1m imps:</td><td>0</td></tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="info_box" style="color: #043960;">
+			<h2>Budget Pace</h2>
+			<div class="total_budget">
+				<p>Total Budget</p>
+				<div id="budget">0.00</div>
+			</div>
+			<div class="budget_bar">
+				<div class="budget_remaining">Remaining:<br/><div></div></div>
+				<p>Spent</p>
+				<div class="pacing_container">			
+					<div class="pacing"></div>
+					<span>
+						<div class="total_spent_text">0</div>
+					</span>	
+					<div class="optimum_indicator">	</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="clear"></div>
+	<div class="interactive_box">
+		<select id="choose_line" class="chosen-select-line" data-placeholder="Choose line" style="display: none;">
+			<option value=""></option>
+			<option value="Impressions" data-position="2" >Impressions</option>
+			<option value="Clicks" data-position="3">Clicks</option>
+			<option value="Conversions" data-position="4">Conversions</option>
+			<option value="CTR" data-position="5">CTR</option>
+			<option value="eCPA" data-position="1">eCPA</option>
+			<option value="Conversion Rate" data-position="6">Conversion Rate</option>
+		</select>
+		<div class="chosen-container chosen-container-single chosen-container-single-nosearch chosen-container-active chosen-with-drop" style="width: 186px; margin-right:20px;" title="" id="choose_line_chosen">
+			<a class="chosen-single lines" tabindex="-1">
+				<span>Choose line</span>
+				<div>
+					<b>
+					</b>
+				</div>
+			</a>
+			<div class="chosen-drop" style="border-bottom: 0px;">
+				<div class="chosen-search">
+					<input type="text" autocomplete="off" readonly="">
+				</div>
+				<ul class="chosen-results" id="line-results" style="display:none;">
+					<li class="active-result result-selected" style="" data-option-array-index="1">Impressions</li>
+					<li class="active-result" style="" data-option-array-index="2">Clicks</li>
+					<li class="active-result" style="" data-option-array-index="3">Conversions</li>
+					<li class="active-result" style="" data-option-array-index="4">CTR</li>
+					<li class="active-result" style="" data-option-array-index="5">eCPA</li>
+					<li class="active-result" style="" data-option-array-index="6">Conversion Rate</li>
+				</ul>
+			</div>
+		</div>
+
+		<select id="choose_bar" class="chosen-select-bar" data-placeholder="Choose bar" style="display:none">
+			<option value=""></option>
+			<option value="Impressions" data-position="2">Impressions</option>
+			<option value="Clicks" data-position="3">Clicks</option>
+			<option value="Conversions" data-position="4">Conversions</option>
+			<option value="CTR" data-position="5">CTR</option>
+			<option value="eCPA" data-positsion="1">eCPA</option>
+			<option value="Conversion Rate" data-position="6">Conversion Rate</option>
+		</select>
+		<div class="chosen-container chosen-container-single chosen-container-single-nosearch chosen-container-active chosen-with-drop" style="width:186px;" title="" id="choose_bar_chosen">
+			<a class="chosen-single chosen-default" id="bar" tabindex="-1">
+				<span>Choose bar</span>
+				<div>
+					<b>
+					</b>
+				</div>
+			</a>
+			<div class="chosen-drop" style="border-bottom: 0px;">
+				<div class="chosen-search">
+					<input type="text" autocomplete="off" readonly="">
+				</div>
+				<ul class="chosen-results" id="bar-results" style="display:none">
+					<li class="active-result" style="" data-option-array-index="1">Impressions</li>
+					<li class="active-result" style="" data-option-array-index="2">Clicks</li>
+					<li class="active-result" style="" data-option-array-index="3">Conversions</li>
+					<li class="active-result" style="" data-option-array-index="4">CTR</li>
+					<li class="active-result" style="" data-option-array-index="5">eCPA</li>
+					<li class="active-result" style="" data-option-array-index="6">Conversion Rate</li>
+				</ul>
+			</div>
+		</div>
+		<div id="download_btn">
+			<select id="select_download_type" class="chosen-select-download" data-placeholder="Export" style="display:none;">
+				<option value="0"></option>
+				<option value="Print">Print</option>
+				<option value="CSV">.CSV</option>
+			</select>
+			<div class="chosen-container chosen-container-single chosen-container-single-nosearch chosen-container-active chosen-with-drop" style="width: 186px;" title="" id="select_download_type_chosen">
+				<a class="chosen-single chosen-default select_download_type_chosen" tabindex="-1">
+					<span>Export</span>
+					<div>
+						<b>
+						</b>
+					</div>
+				</a>
+				<div class="chosen-drop" style="border-bottom: 0px;">
+					<div class="chosen-search">
+						<input type="text" autocomplete="off" readonly="">
+					</div>
+					<ul class="chosen-results" id="download-type-results" style="display:none;">
+						<li class="active-result" style="" data-option-array-index="1">Print</li>
+						<li class="active-result" style="" data-option-array-index="2">.CSV</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+</div>
+ <script type="text/javascript">
+
+	google.load("visualization", "1", {packages:["corechart"]});
+
+	var chart = '';
+	var interactive_box_down = first_load = true;
+
+	$(document).ready(function(){
+		$('#start_date').change(function(){
+			$('#end_date').datepicker("option", "minDate", $('#start_date').datepicker('getDate'));	
+		});
+
+		runChosenAdvertiser();
+		runChosenCampaign();
+
+		$('.optimum_indicator').bind(function(){
+			 mouseenter = function(){
+			 	// console.log('something');
+			 }
+		});		
+	});
+
+
+	function formatNumber(number) {
+    	return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	}
+
+	function runChosenAdvertiser(){
+
+		var config = {
+	      '.chosen-select-advertiser': {width:"186px",disable_search:false},
+	      '.chosen-select-deselect'  : {allow_single_deselect:true},
+	      '.chosen-select-no-single' : {disable_search_threshold:10},
+	      '.chosen-select-no-results': {no_results_text:'nothing found.'}
+	    }
+	    for (var selector in config) {
+	      $(selector).chosen(config[selector]);
+	    }	
+	}
+
+	function runChosenCampaign(){
+
+		var config = {
+	      '.chosen-select-campaign'  : {width:"186px",disable_search:false},
+	      '.chosen-select-deselect'  : {allow_single_deselect:true},
+	      '.chosen-select-no-single' : {disable_search_threshold:10},
+	      '.chosen-select-campaign-no-results': {no_results_text:'nothing found.'}
+	    }
+	    for (var selector in config) {
+	      $(selector).chosen(config[selector]);
+	    }	
+	}
+	function runChosenGraph()
+	{
+		var config = {
+	      '.chosen-select-line'  : {width:"186px",disable_search:true},
+	      '.chosen-select-deselect'  : {allow_single_deselect:true},
+	      '.chosen-select-no-single' : {disable_search_threshold:10},
+	      '.chosen-select-campaign-no-results': {no_results_text:'nothing found.'}
+	    }
+	    for (var selector in config) {
+	      $(selector).chosen(config[selector]);
+	    }
+	    var config = {
+	      '.chosen-select-bar'  : {width:"186px",disable_search:true},
+	      '.chosen-select-deselect'  : {allow_single_deselect:true},
+	      '.chosen-select-no-single' : {disable_search_threshold:10},
+	      '.chosen-select-campaign-no-results': {no_results_text:'nothing found.'}
+	    }
+	    for (var selector in config) {
+	      $(selector).chosen(config[selector]);
+	    }
+	}
+
+	function runChosenDownload()
+	{
+		var config = {
+	      '.chosen-select-download'  : {width:"186px",disable_search:true},
+	      '.chosen-select-deselect'  : {allow_single_deselect:true},
+	      '.chosen-select-no-single' : {disable_search_threshold:10},
+	      '.chosen-select-campaign-no-results': {no_results_text:'nothing found.'}
+	    }
+	    for (var selector in config) {
+	      $(selector).chosen(config[selector]);
+	    }
+	}
+
+	function draw_chart()
+	{
+    	var start_date_format = $('#start_date').datepicker('getDate');
+    	var end_date_format = $('#end_date').datepicker('getDate');
+    	var campaign_id = $('#choose_campaign option:selected').val();
+		var start_date = $.datepicker.formatDate('yy-mm-dd', new Date(start_date_format));
+		var end_date = $.datepicker.formatDate('yy-mm-dd', new Date(end_date_format));
+
+		$.ajax({
+		    url: "http://open.mediamath.com/demo/tradingdesk/reports/get_campaign_range",
+		    type: "post",
+		    dataType: "json",
+		    data: { start_date: start_date, end_date:end_date, campaign_id:campaign_id}
+		}).done(function(data){
+		if (data.success)
+		{
+	    	range_info(data);
+				
+			var line_name = $('#choose_line').find(':selected').attr('value');
+			var line_pos = $('#choose_line').find(':selected').attr('data-position');
+			var bar_name = $('#choose_bar').find(':selected').attr('value');
+			var bar_pos = $('#choose_bar').find(':selected').attr('data-position');
+			if(data.chart_info == false || typeof data.chart_info == undefined)
+			{	
+					$("interactive_box").slideUp("fast");
+					interactive_box_down = false;
+					
+					$('#chart_div').empty();
+					first_load = true;
+					chart =  new google.visualization.ColumnChart(document.getElementById('chart_div'));
+			}
+			else {
+				if(first_load){
+					draw_blank_chart(data);
+					first_load = false;
+				}
+				else 
+				{
+					if(!line_name || !bar_name) {draw_blank_chart(data); return;}
+
+					var line_position = [[line_name],[line_pos]];
+					var bar_position = [[bar_name],[bar_pos]];
+
+					/*
+
+						
+
+					*/
+
+					var options = {
+					  vAxes: [
+					  			{
+					  				title: ""+line_position[0]+"", minValue: 0, titleTextStyle: {color: 'blue'} 
+					  			},
+					  			{
+					  				title : "Cummulative "+bar_position[0]+"", minValue: 0, titleTextStyle: {color: 'red'}
+					  			}
+					  		],
+					  hAxis: {title: 'Dates'},
+					  series:[
+					        	{targetAxisIndex:0, type: "line"},
+					        	{targetAxisIndex:1}
+							],
+						animation: {easing: 'in', duration: 1000},
+						legend: {position: 'top',  alignment: 'start'}
+					};
+
+					if(!interactive_box_down)
+					{
+						$(".interactive_box").slideDown("fast");
+					}
+
+					var chart_data =  [['Dates', ""+line_position[0]+"", ""+bar_position[0]+""]];
+					chart_data[1] =  Array(data.chart_info[1][0], data.chart_info[1][line_position[1]], data.chart_info[1][bar_position[1]]);
+					
+					for (var i = 2; i < data.chart_info.length; i++)
+					{
+						chart_data[i] =  Array(data.chart_info[i][0], data.chart_info[i][line_position[1]], (data.chart_info[i][bar_position[1]] + chart_data[i-1][2]));
+					};
+					
+					var data = google.visualization.arrayToDataTable(chart_data);
+		       	 	chart.draw(data, options);
+
+				}
+			}
+	    }
+	    else
+	    {
+			alert('could not update with the dates provided.');
+	    }
+		});
+	}
+	function draw_blank_chart(data)
+	{
+
+		var options = {
+	      vAxes: [
+	      			{
+	      				title: 'Line', minValue: 0, titleTextStyle: {color: 'blue'} 
+	      			},
+	      			{
+	      				title : 'Bar', minValue: 0, titleTextStyle: {color: 'red'}
+	      			}
+	      		],
+	      hAxis: {title: 'Dates'},
+	      series:[
+	            	{targetAxisIndex:0, type: "line"},
+	            	{targetAxisIndex:1}
+				],
+			animation: {easing: 'in', duration: 1000},
+			legend: {position: 'top',  alignment: 'start'}
+	    };
+
+		/*change structure of json to match google charts*/
+		var full_dates =  [['Dates','Line', 'Bar']];
+
+		for (var i = 1; i < data.chart_info.length; i++) {
+			full_dates[i] =  Array(data.chart_info[i][0],0,0);
+		};
+   	
+		chart =  new google.visualization.ColumnChart(document.getElementById('chart_div'));
+		var data = google.visualization.arrayToDataTable(full_dates);
+   	 	chart.draw(data, options);
+	}
+
+	function range_info(data){
+
+		var oneDay = 24*60*60*1000;	// hours*minutes*seconds*milliseconds
+		var expected_spend = "";
+		var optimum_indicator = "";
+		
+		value = data.range_info;
+
+		var start_date = new Date(value.START_DATE);
+		var end_date =  new Date(value.END_DATE);
+		var diffDays = Math.abs((start_date.getTime() - end_date.getTime())/(oneDay));
+		
+		total_budget = total_budget.replace(/,/g, '');
+
+		impressions = formatNumber(value.IMPRESSIONS);
+		conversions = formatNumber(value.conversions);
+		total_spend = value.TOTAL_SPEND;
+		eCPA = formatNumber(value.eCPA);
+		eCPM = formatNumber(value.eCPM);
+		conversionsPerMil = formatNumber(value.conversionsPerMil);
+		clicks = formatNumber(value.CLICKS);
+		CTR = ((clicks / impressions) * 100).toFixed(2);
+		
+		
+		optimum_rate = Math.round(total_budget/value.days_to_run).toFixed(2);
+		expected_spend = diffDays * optimum_rate;
+		optimum_indicator = Math.round(expected_spend/total_budget * 100);
+
+		fillPercentage = 100 - Math.round(total_spend/total_budget * 100);
+
+		var budget_remaining = Math.round(total_budget - total_spend).toFixed(2);
+
+		
+		if(optimum_indicator='100'){optimum_indicator = '99';};
+
+		if((expected_spend > total_spend) && (diffDays == value.days_to_run)){
+			//money remaining
+			$('.pacing').empty().css({width: fillPercentage+'%', display:'block'});
+			// $('.optimum_indicator').css({left: optimum_indicator+'%', display:'block',width: '2px'});
+			$('.pacing_container').css({ display: 'block'});
+		}
+		else{
+			$('.pacing').hide();
+			$('.pacing_container').css({display: 'block'});
+		}
+		    
+	 	row_range = '<tr><td>Impression</td><td>'+impressions+'</td></tr><tr><td>Clicks</td><td>'+clicks+'</td></tr><tr><td>Conversions</td><td>'+conversions+'</td></tr><tr><td>eCPA</td><td>'+eCPA+'</td></tr><tr><td>eCPM</td><td>'+eCPM+'</td></tr><tr><td>Conversions per 1m imps</td><td>'+conversionsPerMil+'</td></tr>';
+
+		$('.date_range_info').empty().append(row_range);
+		$('.total_spent_text').empty().append(formatNumber(total_spend));
+		 
+	}
+
+	function clear_all_data(){
+
+		var empty_info = "<tr><td>Campaign Budget (&pound;):</td><td></td></tr><tr><td>CPM sold (&pound;):</td><td></td></tr><tr><td>Impressions:</td><td></td></tr><tr><td>CPA target:</td><td></td></tr><tr><td>Campaign start:</td><td></td></tr><tr><td>Campaign end:</td><td></td></tr>";
+		var empty_results = '<tr><td>Impression</td><td></td></tr><tr><td>Clicks</td><td></td></tr><tr><td>Conversions</td><td></td></tr><tr><td>eCPA</td><td></td></tr><tr><td>eCPM</td><td></td></tr><tr><td>Conversions per 1m imps</td><td></td></tr>';
+		var empty_budget = '<tr><td>Campaign Budget (&pound;):</td><td></td></tr><tr><td>CPM sold (&pound;):</td><td></td></tr><tr><td>Impressions:</td><td></td></tr><tr><td>CPA target:</td><td></td></tr><tr><td>Campaign start:</td><td></td></tr><tr><td>Campaign end:</td><td></td></tr>';
+		
+		$('#campaign_info').empty().append(empty_info);
+		$('.date_range_info').empty().append(empty_results);
+		$("#start_date, #end_date").val("");
+		$('#budget, #chart_div, .total_spent_text').empty();
+		$('.pacing_container').css("display","none");
+		$(".interactive_box").slideUp("fast");
+		first_load = true;
+	}
+
+    $("#start_date_btn").click(function(event) {
+    	event.preventDefault();
+  		$( "#start_date" ).datepicker('show');
+	});
+
+	$("#end_date_btn").click(function(event) {
+    	event.preventDefault();
+  		$( "#end_date" ).datepicker('show');
+	});
+	/*
+		get all advertiser and populate options
+	*/
+	$('.choose_advertiser').change(function() {
+
+		var advertiser_id = $('option:selected', this).attr('id');
+
+    	$.ajax({
+		    url: "http://open.mediamath.com/demo/tradingdesk/reports/get_campaigns_ajax",
+		    type: "post",
+		    dataType: "json",
+		    data: { advertiser_id: advertiser_id}
+			}).done(function(data){
+			if (data.success)
+			{
+    	        var row = '<option value="0">Select a campaign</option>';
+    	    
+				$.each(data.campaigns, function(key, value)
+				{
+					row += '<option value="'+key+'">'+value+'</option>';
+				});
+
+				$('.chosen-select-campaign').empty().attr('data-placeholder','Select a campaign...').append(row);
+				$(".chosen-select-campaign").val('').trigger("chosen:updated");
+				runChosenCampaign();
+			}
+			else
+			{
+		    	$('.chosen-select-campaign').empty().attr('data-placeholder','No campaign found.');
+		    	$(".chosen-select-campaign").val('').trigger("chosen:updated");
+		    	 runChosenCampaign();
+		    	 clear_all_data();
+			}
+		});
+	});
+
+	/*get campaign information based on selected campaign*/
+	$('#choose_campaign').change(function(){
+
+		var campaign_id = $('#choose_campaign option:selected').val();  
+		// $('#start_date, #end_date').datepicker();
+
+		if(campaign_id == 0){clear_all_data();return;}
+
+    	$.ajax({
+		    url: "http://open.mediamath.com/demo/tradingdesk/reports/get_campaign_info",
+		    type: "post",
+		    dataType: "json",
+		    data: { campaign_id: campaign_id }
+		}).done(function(data){
+			if (data.success)
+			{
+				$('#start_date, #end_date').datepicker("destroy");
+
+				var impressions = overall_impressions = start_date_format = end_date_format = start_date = end_date = CTR = conversions = eCPA = eCPM = CPM = conversionsPerMil = row_campaign = row_range = total_budget = fillPercentage = optimum_rate = days_to_run = cpa_target = '';
+
+				value = data.campaign_info;
+				
+				total_budget = formatNumber(Math.round(value.total_budget).toFixed(2));
+				overall_impressions = formatNumber(value.overall_impressions);
+				cpa_target = Math.floor(value.cpa_target * 100) / 100;
+				start_date = value.start_date;
+				end_date = value.end_date;
+				
+				days_to_run = value.days_to_run;
+				CPM = formatNumber(value.CPM);
+				row_campaign += '<tr><td>Campaign Budget (&pound;):</td><td>'+total_budget+'</td></tr><tr><td>CPM sold (&pound;):</td><td>'+CPM+'</td></tr><tr><td>Impressions:</td><td>'+overall_impressions+'</td></tr><tr><td>CPA target:</td><td>'+cpa_target.toFixed(2)+'</td></tr><tr><td>Campaign start:</td><td>'+value.start_date+'</td></tr><tr><td>Campaign end:</td><td>'+value.end_date+'</td></tr>';
+
+				$('#campaign_info').empty().append(row_campaign);
+				$('#budget').empty().append(total_budget);
+				$('#update_range').css("visibility","visible");
+				$('#start_date, #end_date').datepicker({ inline: true, showOtherMonths: true,  selectOtherMonths: false, dateFormat: 'dd/mm/yy', dayNamesMin: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], minDate: start_date, maxDate: end_date});
+				$('#start_date').val(start_date);
+				$('#end_date').val(end_date);
+				$(".interactive_box").slideDown("slow");
+
+				draw_chart();
+				runChosenGraph();
+				runChosenDownload();
+			}
+			else
+			{
+			    clear_all_data();
+			}
+		});
+	});
+
+    $("#update_range").click(function(event) {
+    	event.preventDefault();	
+		draw_chart();
+	});
+
+	$('#choose_line, #choose_bar').change(function() {
+		var line_name = $('#choose_line').find(':selected').attr('value');
+		var line_pos = $('#choose_line').find(':selected').attr('data-position');
+		var bar_name = $('#choose_bar').find(':selected').attr('value');
+		var bar_pos = $('#choose_bar').find(':selected').attr('data-position');
+		var line_position = [[line_name],[line_pos]];
+		var bar_position = [[bar_name],[bar_pos]];
+		draw_chart();
+	});
+
+	$('#select_download_type').change(function(event) {
+		event.preventDefault();	
+		var campaign_id = $('#choose_campaign option:selected').val();
+    	var start_date_format = $('#start_date').datepicker('getDate');
+    	var end_date_format = $('#end_date').datepicker('getDate');
+		var start_date = $.datepicker.formatDate('yy-mm-dd', new Date(start_date_format));
+		var end_date = $.datepicker.formatDate('yy-mm-dd', new Date(end_date_format));
+		var download_type = $('#select_download_type').find(':selected').attr('value');
+
+		$('#select_download_type').val(0).trigger('chosen:updated');
+
+		if(download_type == 'CSV'){
+			window.location = "http://open.mediamath.com/demo/tradingdesk/reports/download_csv/"+campaign_id+"/"+start_date+"/"+end_date;
+		}
+		if(download_type == 'Print'){
+			window.print();
+		}
+
+	});
+
+
+</script>
+
+
+
+
+		</div>
+	</body>
+</html>

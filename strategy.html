@@ -1,0 +1,639 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<base href="/">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Trading Desk</title>
+	<meta name="description" content="" />
+	<link href='http://fonts.googleapis.com/css?family=Alegreya+Sans' rel='stylesheet' type='text/css'> 
+	<link rel="shortcut icon" href="#" />
+	<meta name="viewport" content="width=device-width"/>
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery-1.11.0.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery.placeholder.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery-ui-1.10.3.min.js"></script>
+	<script rel="stylesheet" href="http://open.mediamath.com/demo/tradingdesk/assets/_js/jqueryui/custom/jquery-ui-1.10.4.custom.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery-ui-1.10.4.custom.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/spin.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/chosen/chosen.jquery.min.js"></script>
+	<script src="http://code.highcharts.com/highcharts.js"></script>
+	<script src="http://code.highcharts.com/highcharts-more.js"></script>
+	<!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<link rel="stylesheet" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/bootstrap.css" />
+	<link rel="stylesheet" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/jquery.selectBoxIt.css" />
+	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/jqueryui/custom/jquery-ui-1.10.4.custom.css" />
+	<link rel="stylesheet" type="text/css" href="accuen-trader/common.css"/>
+	<link rel="stylesheet" type="text/css" href="accuen-trader/demo.css"/>
+	<link rel="stylesheet" type="text/css" href="accuen-trader/menu.css" />
+	<!-- <link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/common.css"/>
+	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/demo.css"/>
+	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/menu.css" /> -->
+  	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/chosen/chosen.min.css">
+</head>
+<script>
+$(document).ready(function(){
+	var config = {
+      '.chosen-select'  : {width: '100%', disable_search_threshold:10},
+      '.chosen-select-deselect'  : {allow_single_deselect:true},
+      '.chosen-select-no-single' : {disable_search_threshold:10},
+      '.chosen-select-campaign-no-results': {no_results_text:'nothing found.'}
+    }
+
+    for (var selector in config)
+    {
+    	$(selector).chosen(config[selector]);
+    }
+
+    $( "input.datepicker" ).datepicker({dateFormat: 'd/m/yy'});
+
+
+	$('input, textarea').placeholder();
+
+	$('#search').submit(function(){
+		event.preventDefault();
+		var search = encodeURIComponent($('#search_criteria').val());
+		if (search.length == 0){search = '0';}
+
+		var current_url = 'http://open.mediamath.com/demo/tradingdesk/strategies/strategy_templates';
+		var parts = current_url.split('/');
+		var length = parts.length;
+		var new_url = current_url.replace(parts[length-2]+'/'+parts[length-1],'');
+		window.location = new_url + '0/' + search.replace("'",'%27'); 
+	});
+
+	$('textarea#targetting').bind({
+		focus: function(){
+			$(this).animate({
+				width: "300px",
+				height: "110px"
+			});
+		},
+		focusout: function(){
+			$(this).animate({
+				width: "186px",
+				height: "64px"
+			});
+		}
+	});
+
+	$('textarea#ad_server_tags').bind({
+		focus: function(){
+			$(this).animate({
+				width: "500px",
+				height: "250px"
+			});
+		},
+		focusout: function(){
+			$(this).animate({
+				width: "186px",
+				height: "64px"
+			});
+		}
+	});
+
+});
+
+var first_load = true;
+function show_ajax_loader(show)
+{		
+		var opts = {
+		  lines: 10, // The number of lines to draw
+		  length: 0, // The length of each line
+		  width: 5, // The line thickness
+		  radius: 13, // The radius of the inner circle
+		  corners: 1, // Corner roundness (0..1)
+		  rotate: 0, // The rotation offset
+		  direction: 1, // 1: clockwise, -1: counterclockwise
+		  color: '#fff', // #rgb or #rrggbb or array of colors
+		  speed: 0.8, // Rounds per second
+		  trail: 15, // Afterglow percentage
+		  shadow: false, // Whether to render a shadow
+		  hwaccel: false, // Whether to use hardware acceleration
+		  className: 'spinner', // The CSS class to assign to the spinner
+		  zIndex: 2e9, // The z-index (defaults to 2000000000)
+		  top: '120', // Top position relative to parent in px
+		  left: '50px' // Left position relative to parent in px
+		};
+		
+		var target = document.getElementById('ajax_loader');
+		
+	if (show)
+	{
+		if(first_load){var spinner = new Spinner(opts).spin(target); first_load=false;}
+		else{spinner;}
+
+		$("#dialog-ajax").dialog({
+	      	modal: true,
+	      	closeOnEscape: false,
+	      	draggable: false,
+	      	dialogClass: 'ajax-loading',
+			width: 250,
+			height: 150,
+			resizable: false
+	    });
+	}
+	else
+	{
+		$("#dialog-ajax").dialog('close');
+	}
+}
+
+
+
+
+</script>
+
+<div id="top_heading">
+	<div class="container960">
+			<!-- <div class="" id="logoHead">
+			</div> -->
+			<img id="accuen-logo" src="http://www.visualdna.com/wp-content/uploads/2014/09/ACCUEN_logo_big1.png">
+
+			
+			<div class="" id="userType">
+				<div id="cssmenu">
+					<ul>
+					    <li class=""><a href="accuen-trader/traders.html"><span>Home</span></a></li>
+					    <li class="has-sub"><a href="javascript: void(0);"><span>Campaigns</span></a>
+					        <ul>
+					        						        	<li><a href="accuen-trader/pending.html"><span>Pending</span></a></li>
+					        	<li><a href="accuen-trader/accepted.html"><span>Accepted</span></a></li>
+					        	<li class="last"><a href="accuen-trader/rejected.html"><span>Rejected</span></a></li>
+					        </ul>
+					   	</li>
+					    <li class="">
+					    	<a href="javascript: void(0);"><span>Reports</span></a>
+
+					    	<ul>
+					    		<li> <a href="accuen-trader/reports.html"> <span>Statistics</span> </a> </li>
+					    							    	</ul>
+
+					    </li>
+					    					    <li class="has-sub"><a href="javascript: void(0);"><span>Administration</span></a>
+							<ul>
+					        	<li><a href="accuen-trader/createUsers.html"><span>Create Users</span></a></li>
+					        	<li><a href="accuen-trader/editUsers.html"><span>Edit Users</span></a></li>
+					        	<li><a href="accuen-trader/agencies.html"><span>Agencies</span></a></li>
+					        						        	<li><a href="accuen-trader/strategy.html"><span>Strategy Templates</span></a></li>
+					        	<li class="last"><a href="accuen-trader/targeting.html"><span>Targeting Templates</span></a></li>
+					        </ul>
+					    </li>
+					    					    <li class="last"><a href="accuen-trader/login.html">Logout</a></li>
+					</ul>
+				</div>
+			</div>
+				</div>
+</div>
+<div class="breadcrumb">
+	<div class="container960">
+		<img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/pendingCampaign.png"/><h1>Strategy Templates</h1>	</div>
+</div>
+<div class="container960">
+	<div id="dialog-ajax" title="Loading" style="display: none; text-align: center; background-color: #38617f;">
+		<div id="ajax_loader" style="float:left; width: 45%; margin: 65px 0 0 0px;">
+		    <!-- <img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/ajax_loader.gif" /> -->
+	    </div>
+	    <div style="float: left; margin: 50px 0px 0px 0px; color: #69889f; font-size: 22px;">
+	    	Loading
+		</div>
+	</div>
+<script>
+
+$(document).ready(function(){
+
+	$('#frequency_interval, #frequency_amount').parent().parent().hide();
+
+	$('#strategy_template_id').change(function(){
+		if ($(this).val() > 0)
+		{
+			$('#template_settings_table').fadeIn();
+		}
+		else
+		{
+			$('#template_settings_table').fadeOut();
+			return;
+		}
+		show_ajax_loader(true);
+
+		$.ajax({
+		    url: "http://open.mediamath.com/demo/tradingdesk/strategies/ajax_get_strategy_template/" + $(this).val(),
+		    type: "get",
+		    dataType: "json"
+		}).done(function(data){
+			
+			$('#targetting_template_select, #site_list_select').empty().chosen();
+
+			$.each(data, function(parameter, setting){
+				if (parameter == 'targetting_templates')
+				{
+					$.each(setting, function(key, targetting_template){
+						if (key >= 0)
+						{
+							$('#targetting_template_select').append('<option ' + (targetting_template.selected ? 'selected="selected" ' : '') + 'value="' + targetting_template.targetting_template_id + '">' + targetting_template.template_name + '</option>');
+						}
+					});
+					$("#targetting_template_select").trigger("chosen:updated");
+				}
+				else if (parameter == 'site_lists')
+				{
+					$.each(setting, function(key, site_list){
+						if (key >= 0)
+						{
+							$('#site_list_select').append('<option ' + (site_list.selected ? 'selected="selected" ' : '') + 'value="' + site_list.site_list_id + '">' + site_list.site_list + '</option>');
+						}
+						else if (key == 'user_editable')
+						{
+							$('#site_lists_user_editable').prop('checked', site_list);
+						}
+					});
+					$("#site_list_select").trigger("chosen:updated");	
+				}
+				else
+				{
+					$('input[name=' + parameter + ']').val(setting.value).trigger("change").trigger('chosen:updated');
+					var checkbox = (setting.user_editable == 1) ? true : false;
+					$('#' + parameter + '_user_editable').prop('checked', checkbox).trigger('change');
+
+				}
+			});
+			show_ajax_loader(false);
+		});
+	});
+
+	$('#use_optimization').change(function(){
+		if($(this).val() == '0')
+		{
+			$('#goal_type, #bid_aggressiveness').parent().parent().fadeOut('slow');
+		}
+		else
+		{
+			$('#goal_type').parent().parent().fadeIn('slow');
+			if ($('#goal_type').val() == 'reach')
+			{
+				$('#bid_aggressiveness').parent().parent().fadeIn('slow');
+			}
+		}
+	});
+
+	$('#use_optimization_user_editable').change(function(){
+		$('#goal_type_for_show, #bid_aggressiveness_for_show').prop('checked', $(this).is(':checked'));
+	});
+
+	$('#goal_type').change(function(){
+		if($(this).val() == 'reach')
+		{
+			$('#bid_aggressiveness').parent().parent().fadeIn('slow');
+		}
+		else
+		{
+			$('#bid_aggressiveness').parent().parent().fadeOut('slow');
+		}
+	});
+
+	$('#frequency_type_user_editable').change(function(){
+		$('#frequency_amount_for_show, #frequency_interval_for_show').prop('checked', $(this).is(':checked'));
+	});
+
+	$('#frequency_type').change(function(){
+		if ($(this).val() == 'no-limit')
+		{
+			$('#frequency_interval, #frequency_amount').parent().parent().fadeOut('slow');
+		}
+		else
+		{
+			$('#frequency_interval, #frequency_amount').parent().parent().fadeIn('slow');
+		}
+	});
+
+
+
+
+});
+
+function save_template(event){
+	event.preventDefault();
+
+	if ($('#strategy_template_id').val() > 0)
+	{
+	    $.ajax({
+	        url     : "http://open.mediamath.com/demo/tradingdesk/strategies/ajax_save_strategy_template/" + $('#strategy_template_id').val(),
+	        type    : 'post',
+	        dataType: 'json',
+	        data    : $('#template_form').serialize()
+	    }).done(function(data){
+		    if (data.success)
+		    {
+		    	$('#green_tick').show().fadeOut(2000);
+		 	}
+		 	else
+		 	{
+		 		$('#errors').empty();
+		 		$.each(data.errors, function(field, error){
+		 			$('#errors').append(error + '<br />');
+		 		});
+
+		 		$( "#dialog-message" ).dialog({
+			      	modal: true,
+	    			width:'auto',
+			      	buttons: {
+			        	Ok: function() {
+			        		$( this ).dialog( "close" );
+			        	}
+			      	}
+			    });
+		 	}
+		});
+	}
+}
+
+function create_template()
+{
+	var template_name = $('#template_name').val();
+    $.ajax({
+        url     : "http://open.mediamath.com/demo/tradingdesk/strategies/ajax_create_strategy_template",
+        type    : 'post',
+        dataType: 'json',
+        data    : {
+        	template_name: template_name
+        }
+    }).done(function(data){
+	    if (data.success)
+	    {
+	    	$('#strategy_template_id').append('<option value="' + data.strategy_template_id + '">' + template_name + '</option>').val(data.strategy_template_id).trigger('change').trigger('chosen:updated');
+	    	$('#template_name').val('');
+	    	$('#name').val(template_name);
+	 	}
+	});    	
+}
+
+function delete_template()
+{
+	if ($('#strategy_template_id').val() > 0)
+	{
+		$("#dialog-confirm").html("Are you sure you want to delete &quot;" + $('#strategy_template_id option:selected').text() + '&quot;?<br /><br />This action is not reversible.');
+		$("#dialog-confirm" ).dialog({
+	      	resizable: false,
+	      	width: 'auto',
+	      	height: 'auto',
+	      	modal: true,
+	      	buttons: {
+		        "Delete": function()
+		        {
+		        	var strategy_template_id = $('#strategy_template_id').val();
+					 $.ajax({
+				            url     : "http://open.mediamath.com/demo/tradingdesk/strategies/ajax_delete_strategy_template/" + strategy_template_id,
+				            type    : 'post',
+				            dataType: 'json',
+				        }).done(function(data){
+						    if (data.success)
+						    {
+						    	$('#strategy_template_id option[value="' + strategy_template_id  + '"]').remove();
+						    	$('#strategy_template_id').val('0').trigger('change').trigger('chosen:updated');
+						 	}
+						}); 
+		          	$(this).dialog("close");
+		        },
+		        Cancel: function()
+		        {
+		         	$(this).dialog("close");
+		        }
+	      	}
+	    });
+	}
+}
+
+</script>
+<div id="strategy_template_page" style="margin-bottom: 300px;">
+	<div id="dialog-message" title="Error" style="display: none;">
+	  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span><span id="errors"></span></p>
+	</div>
+	<div id="dialog-confirm" title="Confirm" style="display: none;">
+	  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span><span id="dialog-message"></span></p>
+	</div>
+	<br />
+	<table align="center">
+	<thead>
+		<tr>
+			<th>Template Name</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	<tr class="data_row">
+		<td>
+			<input id="template_name" type="text" style="width:300px;">
+		</td>
+		<td style="text-align: center;">
+			<input type="submit" onclick="javascript: create_template();" value="Add New">
+		</td>
+		<td></td>
+	</tr>
+	<tr class="data_row">
+		<td><select name="strategy_template_id" id="strategy_template_id" class="chosen-select">
+<option value="0" selected="selected">Select a Template...</option>
+<option value="13">OnSite Low CPM</option>
+<option value="14">OnSite High CPM</option>
+<option value="15">CPC Strategy</option>
+<option value="19">MediaMath Recommended: CPA</option>
+<option value="20">MediaMath Recommended: CTR</option>
+<option value="21">MediaMath Recommended: REM</option>
+</select></td>
+		<td align="center">
+			<img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/save.png" onclick="javascript: $('#template_form').submit(save_template(event));" style="cursor: pointer;" />
+			<img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/trash.png" onclick="delete_template();" style="cursor: pointer;" />
+		</td>
+		<td style="width: 50px"><img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/tick-green.png" id="green_tick" style="display: none;" /></td>
+	</tr>
+	</tbody>
+	</table>
+	<form id="template_form">
+		<table id="template_settings_table" align="center" class="table-form" style="display: none;">
+			<thead>
+				<tr>
+					<th>Strategy Parameter<span class="circle_border"></span></th>
+					<th>Value<span class="circle_border"></span></th>
+					<th>Editable<span class="circle_border"></span></th>
+					<th>Notes<span class="circle_border"></span></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Strategy Name</td>
+					<td><input name="name" type="text" id="name" /></td>
+					<td><input name="name_user_editable" type="checkbox" id="name_user_editable" /></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Description</td>
+					<td><input name="description" type="text" id="description" /></td>
+					<td><input type="checkbox" name="description_user_editable" id="description_user_editable" /></td>
+					<td>Optional description of strategy.</td>
+				</tr>
+				<tr>
+					<td>Use Campaign Start</td>
+					<td><select name="use_campaign_start" id="use_campaign_start" class="chosen-select">
+<option value="1" selected="selected">On</option>
+<option value="0">Off</option>
+</select></td>
+					<td><input name="use_campaign_start_user_editable" type="checkbox" id="use_campaign_start_user_editable" /></td>
+					<td>If set to off, will prompt for strategy start date.</td>
+				</tr>	
+				<tr>
+					<td>Use Campaign End</td>
+					<td><select name="use_campaign_end" id="use_campaign_end" class="chosen-select">
+<option value="1" selected="selected">On</option>
+<option value="0">Off</option>
+</select></td>
+					<td><input name="use_campaign_end_user_editable" type="checkbox" id="use_campaign_end_user_editable" /></td>
+					<td>If set to off, will prompt for strategy end date.</td>
+				</tr>
+				<tr>
+					<td>Strategy Type</td>
+					<td><select name="type" id="type" class="chosen-select">
+<option value="AUD" selected="selected">Audience Targetting (AUD)</option>
+<option value="REM">Remarketing (PMP)</option>
+<option value="GBO">Goal-Based Optimisation (GBO)</option>
+</select></td>
+					<td><input type="checkbox" name="type_user_editable" id="type_user_editable" /></td>
+					<td>Specify the type of strategy.</td>
+				</tr>
+				<tr>
+					<td>Supply Type</td>
+					<td><select name="supply_type" id="supply_type" class="chosen-select">
+<option value="RTB" selected="selected">RTB & Private Marketplace (PMP)</option>
+<option value="RMX_API">Off Exchange Data Feed</option>
+</select></td>
+					<td><input type="checkbox" name="supply_type_user_editable" id="supply_type_user_editable" /></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Strategy Budget</td>
+					<td><input name="budget" type="text" /></td>
+					<td><input name="budget_user_editable" type="checkbox" id="budget_user_editable" /></td>
+					<td>Default budget for strategy, this should usually be left user editable.</td>
+				</tr>
+				<tr>
+					<td>Max Bid</td>
+					<td><input name="max_bid" type="text" id="max_bid" /></td>
+					<td><input type="checkbox" name="max_bid_user_editable" id="max_bid_user_editable" /></td>
+					<td>Bid price when optimisation is off, max bid price when optimision is on.<br /> </td> 
+				</tr>
+				<tr>
+					<td>Use Optimisation</td>
+					<td><select name="use_optimization" id="use_optimization" class="chosen-select">
+<option value="1" selected="selected">On</option>
+<option value="0">Off</option>
+</select></td>
+					<td><input type="checkbox" name="use_optimization_user_editable" id="use_optimization_user_editable" /></td>
+					<td>Enables TerminalOne optimisation algorithm.</td>
+				</tr>	
+				<tr>
+					<td></td>
+					<td class="sub_data"><span class="row_title">Goal Type</span> <select name="goal_type" id="goal_type" class="chosen-select">
+<option value="reach" selected="selected">CPM REACH</option>
+<option value="cpc">CPC</option>
+<option value="cpa">CPA</option>
+</select></td>
+					<td><input type="checkbox" disabled="disabled" id="goal_type_for_show" /></td>
+					<td>When optimisation off, goal type is always set to 'CPM SPEND'</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td class="sub_data"><span class="row_title">Bid Aggressiveness</span> <input name="bid_aggressiveness" type="text" id="bid_aggressiveness" /></td>
+					<td><input type="checkbox" disabled="disabled" id="bid_aggressiveness_for_show" /></td>
+					<td>Bid on media only for % of impressions when Goal Type is CPM REACH. Integer 0 to 100</td>
+				</tr>
+				<tr>
+					<td>Bid Price is for</td>
+					<td><select name="bid_price_is_media_only" id="bid_price_is_media_only" class="chosen-select">
+<option value="1">Media Only</option>
+<option value="0" selected="selected">Total Spend</option>
+</select></td>
+					<td><input type="checkbox" name="bid_price_is_media_only_user_editable" id="bid_price_is_media_only_user_editable" /></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Goal Value</td>
+					<td><input name="goal_value" type="text" /></td>
+					<td><input name="goal_value_user_editable" type="checkbox" id="goal_value_user_editable" /></td>
+					<td>Required, Bid Price.</td>
+				</tr>
+								<tr>
+					<td>Frequency Cap</td>
+					<td><select name="frequency_type" id="frequency_type" class="chosen-select">
+<option value="even">Even</option>
+<option value="asap">ASAP</option>
+<option value="no-limit" selected="selected">No Cap</option>
+</select></td>
+					<td><input type="checkbox" name="frequency_type_user_editable" id="frequency_type_user_editable" /></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td class="sub_data"><span class="row_title">Frequency Amount</span> <input name="frequency_amount" type="text" id="frequency_amount" /></td>
+					<td><input type="checkbox" disabled="disabled" id="frequency_amount_for_show" /></td>
+					<td>Maximum frequency of impressions per user within interval set on frequency interval.</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td class="sub_data"><span class="row_title">Frequency Interval</span> <select name="frequency_interval" id="frequency_interval" class="chosen-select">
+<option value="hour" selected="selected">Hour</option>
+<option value="day">Day</option>
+<option value="week">Week</option>
+<option value="month">Month</option>
+<option value="campaign">Campaign</option>
+<option value="not-applicable">Not Applicable</option>
+</select></td>
+					<td><input type="checkbox" disabled="disabled" id="frequency_interval_for_show" /></td>
+					<td>Interval applicable for Freqency Amount</td>
+				</tr>
+				<tr>
+					<td>Pacing Type</td>
+					<td><select name="pacing_type" id="pacing_type" class="chosen-select">
+<option value="even" selected="selected">Even</option>
+<option value="asap">ASAP</option>
+</select></td>
+					<td><input type="checkbox" name="pacing_type_user_editable" id="pacing_type_user_editable" /></td>
+					<td>WARNING: ASAP pacing may result in spending more than your pacing amount. This could result in overspend.</td>
+				</tr>
+				<tr>
+					<td>Pacing Amount</td>
+					<td><input name="pacing_amount" type="text" /></td>
+					<td><input type="checkbox" name="pacing_amount_user_editable" id="pacing_amount_user_editable" /></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Pacing Interval</td>
+					<td><select name="pacing_interval" id="pacing_interval" class="chosen-select">
+<option value="hour" selected="selected">Hour</option>
+<option value="day">Day</option>
+</select></td>
+					<td><input type="checkbox" name="pacing_interval_user_editable" id="pacing_interval_user_editable" /></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Daily Impression Cap</td>
+					<td><input name="impression_cap" type="text" /></td>
+					<td><input type="checkbox" name="impression_cap_user_editable" id="impression_cap_user_editable" /></td>
+					<td>Sets a limit for daily impressions on the strategy.</td>
+				</tr>
+				<tr>
+					<td valign="top" style="padding-top: 20px;">Site Lists:</td>
+					<td><select multiple="multiple" id="site_list_select" name="site_lists[]" style="width: 400px;"></select></td>
+					<td><input type="checkbox" name="site_lists_user_editable" id="site_lists_user_editable" /></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td valign="top" style="padding-top: 20px;">Allow Targeting Templates:</td>
+					<td><select multiple="multiple" id="targetting_template_select" name="targetting_templates[]" style="width: 400px;"></select></td>
+					<td></td>
+					<td></td>
+				</tr>
+			</tbody>
+		</table>
+	</form>
+</div>
+
+		</div>
+	</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<base href="/">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Trading Desk</title>
+	<meta name="description" content="" />
+	<link rel="shortcut icon" href="#" />
+	<link href='http://fonts.googleapis.com/css?family=Alegreya+Sans' rel='stylesheet' type='text/css'> 
+	<meta name="viewport" content="width=device-width"/>
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery-1.11.0.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery.placeholder.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery-ui-1.10.3.min.js"></script>
+	<script rel="stylesheet" href="http://open.mediamath.com/demo/tradingdesk/assets/_js/jqueryui/custom/jquery-ui-1.10.4.custom.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery-ui-1.10.4.custom.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/spin.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/chosen/chosen.jquery.min.js"></script>
+	<script src="http://code.highcharts.com/highcharts.js"></script>
+	<script src="http://code.highcharts.com/highcharts-more.js"></script>
+	<!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<link rel="stylesheet" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/bootstrap.css" />
+	<link rel="stylesheet" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/jquery.selectBoxIt.css" />
+	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/jqueryui/custom/jquery-ui-1.10.4.custom.css" />
+	<link rel="stylesheet" type="text/css" href="accuen-trader/common.css"/>
+	<link rel="stylesheet" type="text/css" href="accuen-trader/demo.css"/>
+	<link rel="stylesheet" type="text/css" href="accuen-trader/menu.css" />
+	<!-- <link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/common.css"/>
+	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/demo.css"/>
+	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/menu.css" /> -->
+  	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/chosen/chosen.min.css">
+</head>
+<script>
+$(document).ready(function(){
+	var config = {
+      '.chosen-select'  : {width: '100%', disable_search_threshold:10},
+      '.chosen-select-deselect'  : {allow_single_deselect:true},
+      '.chosen-select-no-single' : {disable_search_threshold:10},
+      '.chosen-select-campaign-no-results': {no_results_text:'nothing found.'}
+    }
+
+    for (var selector in config)
+    {
+    	$(selector).chosen(config[selector]);
+    }
+
+    $( "input.datepicker" ).datepicker({dateFormat: 'd/m/yy'});
+
+
+	$('input, textarea').placeholder();
+
+	$('#search').submit(function(){
+		event.preventDefault();
+		var search = encodeURIComponent($('#search_criteria').val());
+		if (search.length == 0){search = '0';}
+
+		var current_url = 'http://open.mediamath.com/demo/tradingdesk/admin/user_create';
+		var parts = current_url.split('/');
+		var length = parts.length;
+		var new_url = current_url.replace(parts[length-2]+'/'+parts[length-1],'');
+		window.location = new_url + '0/' + search.replace("'",'%27'); 
+	});
+
+	$('textarea#targetting').bind({
+		focus: function(){
+			$(this).animate({
+				width: "300px",
+				height: "110px"
+			});
+		},
+		focusout: function(){
+			$(this).animate({
+				width: "186px",
+				height: "64px"
+			});
+		}
+	});
+
+	$('textarea#ad_server_tags').bind({
+		focus: function(){
+			$(this).animate({
+				width: "500px",
+				height: "250px"
+			});
+		},
+		focusout: function(){
+			$(this).animate({
+				width: "186px",
+				height: "64px"
+			});
+		}
+	});
+
+});
+
+var first_load = true;
+function show_ajax_loader(show)
+{		
+		var opts = {
+		  lines: 10, // The number of lines to draw
+		  length: 0, // The length of each line
+		  width: 5, // The line thickness
+		  radius: 13, // The radius of the inner circle
+		  corners: 1, // Corner roundness (0..1)
+		  rotate: 0, // The rotation offset
+		  direction: 1, // 1: clockwise, -1: counterclockwise
+		  color: '#fff', // #rgb or #rrggbb or array of colors
+		  speed: 0.8, // Rounds per second
+		  trail: 15, // Afterglow percentage
+		  shadow: false, // Whether to render a shadow
+		  hwaccel: false, // Whether to use hardware acceleration
+		  className: 'spinner', // The CSS class to assign to the spinner
+		  zIndex: 2e9, // The z-index (defaults to 2000000000)
+		  top: '120', // Top position relative to parent in px
+		  left: '50px' // Left position relative to parent in px
+		};
+		
+		var target = document.getElementById('ajax_loader');
+		
+	if (show)
+	{
+		if(first_load){var spinner = new Spinner(opts).spin(target); first_load=false;}
+		else{spinner;}
+
+		$("#dialog-ajax").dialog({
+	      	modal: true,
+	      	closeOnEscape: false,
+	      	draggable: false,
+	      	dialogClass: 'ajax-loading',
+			width: 250,
+			height: 150,
+			resizable: false
+	    });
+	}
+	else
+	{
+		$("#dialog-ajax").dialog('close');
+	}
+}
+
+
+
+
+</script>
+
+<div id="top_heading">
+	<div class="container960">
+			<!-- <div class="" id="logoHead">
+			</div> -->
+			<img id="accuen-logo" src="http://www.visualdna.com/wp-content/uploads/2014/09/ACCUEN_logo_big1.png">
+			
+			<div class="" id="userType">
+				<div id="cssmenu">
+					<ul>
+					    <li class=""><a href="accuen-trader/traders.html"><span>Home</span></a></li>
+					    <li class="has-sub"><a href="javascript: void(0);"><span>Campaigns</span></a>
+					        <ul>
+					        						        	<li><a href="haccuen-trader/pending.html"><span>Pending</span></a></li>
+					        	<li><a href="accuen-trader/accepted.html"><span>Accepted</span></a></li>
+					        	<li class="last"><a href="accuen-trader/rejected.html"><span>Rejected</span></a></li>
+					        </ul>
+					   	</li>
+					    <li class="">
+					    	<a href="javascript: void(0);"><span>Reports</span></a>
+
+					    	<ul>
+					    		<li> <a href="accuen-trader/reports.html"> <span>Statistics</span> </a> </li>
+					    							    	</ul>
+
+					    </li>
+					    					    <li class="active has-sub"><a href="javascript: void(0);"><span>Administration</span></a>
+							<ul>
+					        	<li><a href="accuen-trader/createUsers.html"><span>Create Users</span></a></li>
+					        	<li><a href="accuen-trader/editUsers.html"><span>Edit Users</span></a></li>
+					        	<li><a href="accuen-trader/agencies.html"><span>Agencies</span></a></li>
+					        						        	<li><a href="accuen-trader/strategy.html"><span>Strategy Templates</span></a></li>
+					        	<li class="last"><a href="accuen-trader/targeting.html"><span>Targeting Templates</span></a></li>
+					        </ul>
+					    </li>
+					    					    <li class="last"><a href="accuen-trader/login.html">Logout</a></li>
+					</ul>
+				</div>
+			</div>
+				</div>
+</div>
+<div class="breadcrumb">
+	<div class="container960">
+		<img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/user.png"/><h1>Create User</h1>	</div>
+</div>
+<div class="container960">
+	<div id="dialog-ajax" title="Loading" style="display: none; text-align: center; background-color: #38617f;">
+		<div id="ajax_loader" style="float:left; width: 45%; margin: 65px 0 0 0px;">
+		    <!-- <img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/ajax_loader.gif" /> -->
+	    </div>
+	    <div style="float: left; margin: 50px 0px 0px 0px; color: #69889f; font-size: 22px;">
+	    	Loading
+		</div>
+	</div>
+<script>
+$(document).ready(function(){
+
+	$(".jform").submit(function(){
+		event.preventDefault();
+		var first_name = $('#first_name').val();
+		var last_name = $('#last_name').val();
+
+		$.ajax({
+		    url: "http://open.mediamath.com/demo/tradingdesk/admin/user_ajax_create",
+		    type: "post",
+		    dataType: "json",
+		    data: { first_name: $('#first_name').val(),
+		    		last_name: $('#last_name').val(),
+		    		email: $('#email').val(),
+		    		third_party_id: $('#third_party_id').val(),
+		    		password: $('#password').val(),
+		    		password2: $('#password2').val(),
+		    		user_type: $('#user_type').val()}
+		}).done(function(data) {
+		    if (data.success)
+		    {
+		   		$('#result').html('<i>' + first_name + ' ' + last_name + ' was successfully created.</i>');
+		   		$('#user_form')[0].reset();
+		    }
+		    else
+		    {
+		    	var er = '<div class="error_msg"><img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/error-arrow.png" class="error_tooltip"/>' + data.error_msg  + '</div>';
+
+		   		for (var i = 0; i < data.fields.length; i++)
+		   		{
+		   			$('#' + data.fields[i]).parent().append(er);
+		   			// $('#' + data.fields[i]).css('border', 'solid 1px #FF0000');
+		   			$('#' + data.fields[i]).css('outline', 'none');
+		   		}
+		    }
+		    $('#result').fadeIn();
+		});
+
+		return false;
+	});
+
+
+	//on focus remove tooltip
+	$('input[type="text"], input[type="password"]').click(function(){
+		$(this).parent().find('.error_msg').remove();
+	});
+
+});
+</script>
+		<div class="sectionbox">
+			<div class="topborder"></div>
+			<form action="http://open.mediamath.com/demo/tradingdesk/users/create" method="post" accept-charset="utf-8" class="jform" id="user_form">				<table align="center" id="create_user">
+					<tr><td align="right">First Name</td><td><input type="text" name="" value="" id="first_name" size="50"  /></td></tr>
+					<tr><td align="right">Last Name</td><td><input type="text" name="" value="" id="last_name" size="50"  /></td></tr>
+					<tr><td align="right">Email</td><td><input type="text" name="" value="" id="email" size="50" autocomplete="off"  /></td></tr>
+					<tr><td align="right">Agency</td><td><select name="third_party_id" id="third_party_id" class="chosen-select" >
+<option value="88">baker</option>
+<option value="87">baker2</option>
+<option value="85">Demo Agency</option>
+<option value="86">lalala</option>
+</select></td></tr>
+					<tr><td align="right">Password</td><td><input type="password" name="" value="" id="password" size="50"  /></td><td class="random_pw" ><img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/random.png" onclick="generate_password()"/><div class="random_pw_info"><img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/pw-arrow.png" class="pw_info_arrow"/>generate random password</div></td></tr>
+					<tr><td align="right">Retype Password</td><td><input type="password" name="" value="" id="password2" size="50"  /></td></tr>
+					<tr><td></td><td></td></tr>
+					<tr><td></td><td align="center">Credentials are emailed<br />on user creation.</td></tr>
+					<tr><td></td><td></td></tr>
+					<tr><td></td><td><input id="cancel_button" type="button" value="Cancel" onclick="window.location='http://open.mediamath.com/demo/tradingdesk/main';" class="faded_button" /> <input type="submit" name="create" value="Create"  /></td></tr>
+				</table>
+			</form>		</div>
+
+<script type="text/javascript">
+
+	function generate_password()
+	{
+		var random = Math.random().toString(36).slice(-8);
+
+	    $('#password').val(random);
+	    $('#password2').val(random);
+	}
+</script>
+		</div>
+	</body>
+</html>

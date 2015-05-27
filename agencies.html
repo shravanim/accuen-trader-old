@@ -1,0 +1,336 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<base href="/">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Trading Desk</title>
+	<meta name="description" content="" />
+	<link rel="shortcut icon" href="#" />
+	<link href='http://fonts.googleapis.com/css?family=Alegreya+Sans' rel='stylesheet' type='text/css'> 
+	<meta name="viewport" content="width=device-width"/>
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery-1.11.0.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery.placeholder.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery-ui-1.10.3.min.js"></script>
+	<script rel="stylesheet" href="http://open.mediamath.com/demo/tradingdesk/assets/_js/jqueryui/custom/jquery-ui-1.10.4.custom.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery-ui-1.10.4.custom.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/spin.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/chosen/chosen.jquery.min.js"></script>
+	<script src="http://code.highcharts.com/highcharts.js"></script>
+	<script src="http://code.highcharts.com/highcharts-more.js"></script>
+	<!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<link rel="stylesheet" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/bootstrap.css" />
+	<link rel="stylesheet" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/jquery.selectBoxIt.css" />
+	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/jqueryui/custom/jquery-ui-1.10.4.custom.css" />
+	<link rel="stylesheet" type="text/css" href="accuen-trader/common.css"/>
+	<link rel="stylesheet" type="text/css" href="accuen-trader/demo.css"/>
+	<link rel="stylesheet" type="text/css" href="accuen-trader/menu.css" />
+	<!-- <link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/common.css"/>
+	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/demo.css"/>
+	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/menu.css" /> -->
+  	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/chosen/chosen.min.css">
+</head>
+<script>
+$(document).ready(function(){
+	var config = {
+      '.chosen-select'  : {width: '100%', disable_search_threshold:10},
+      '.chosen-select-deselect'  : {allow_single_deselect:true},
+      '.chosen-select-no-single' : {disable_search_threshold:10},
+      '.chosen-select-campaign-no-results': {no_results_text:'nothing found.'}
+    }
+
+    for (var selector in config)
+    {
+    	$(selector).chosen(config[selector]);
+    }
+
+    $( "input.datepicker" ).datepicker({dateFormat: 'd/m/yy'});
+
+
+	$('input, textarea').placeholder();
+
+	$('#search').submit(function(){
+		event.preventDefault();
+		var search = encodeURIComponent($('#search_criteria').val());
+		if (search.length == 0){search = '0';}
+
+		var current_url = 'http://open.mediamath.com/demo/tradingdesk/admin/third_parties/0/0';
+		var parts = current_url.split('/');
+		var length = parts.length;
+		var new_url = current_url.replace(parts[length-2]+'/'+parts[length-1],'');
+		window.location = new_url + '0/' + search.replace("'",'%27'); 
+	});
+
+	$('textarea#targetting').bind({
+		focus: function(){
+			$(this).animate({
+				width: "300px",
+				height: "110px"
+			});
+		},
+		focusout: function(){
+			$(this).animate({
+				width: "186px",
+				height: "64px"
+			});
+		}
+	});
+
+	$('textarea#ad_server_tags').bind({
+		focus: function(){
+			$(this).animate({
+				width: "500px",
+				height: "250px"
+			});
+		},
+		focusout: function(){
+			$(this).animate({
+				width: "186px",
+				height: "64px"
+			});
+		}
+	});
+
+});
+
+var first_load = true;
+function show_ajax_loader(show)
+{		
+		var opts = {
+		  lines: 10, // The number of lines to draw
+		  length: 0, // The length of each line
+		  width: 5, // The line thickness
+		  radius: 13, // The radius of the inner circle
+		  corners: 1, // Corner roundness (0..1)
+		  rotate: 0, // The rotation offset
+		  direction: 1, // 1: clockwise, -1: counterclockwise
+		  color: '#fff', // #rgb or #rrggbb or array of colors
+		  speed: 0.8, // Rounds per second
+		  trail: 15, // Afterglow percentage
+		  shadow: false, // Whether to render a shadow
+		  hwaccel: false, // Whether to use hardware acceleration
+		  className: 'spinner', // The CSS class to assign to the spinner
+		  zIndex: 2e9, // The z-index (defaults to 2000000000)
+		  top: '120', // Top position relative to parent in px
+		  left: '50px' // Left position relative to parent in px
+		};
+		
+		var target = document.getElementById('ajax_loader');
+		
+	if (show)
+	{
+		if(first_load){var spinner = new Spinner(opts).spin(target); first_load=false;}
+		else{spinner;}
+
+		$("#dialog-ajax").dialog({
+	      	modal: true,
+	      	closeOnEscape: false,
+	      	draggable: false,
+	      	dialogClass: 'ajax-loading',
+			width: 250,
+			height: 150,
+			resizable: false
+	    });
+	}
+	else
+	{
+		$("#dialog-ajax").dialog('close');
+	}
+}
+
+
+
+
+</script>
+
+<div id="top_heading">
+	<div class="container960">
+			<!-- <div class="" id="logoHead">
+			</div> -->
+			<img id="accuen-logo" src="http://www.visualdna.com/wp-content/uploads/2014/09/ACCUEN_logo_big1.png">
+			
+			<div class="" id="userType">
+				<div id="cssmenu">
+					<ul>
+					    <li class=""><a href="accuen-trader/traders.html"><span>Home</span></a></li>
+					    <li class="has-sub"><a href="javascript: void(0);"><span>Campaigns</span></a>
+					        <ul>
+					        						        	<li><a href="accuen-trader/pending.html"><span>Pending</span></a></li>
+					        	<li><a href="accuen-trader/accepted.html"><span>Accepted</span></a></li>
+					        	<li class="last"><a href="accuen-trader/rejected.html"><span>Rejected</span></a></li>
+					        </ul>
+					   	</li>
+					    <li class="">
+					    	<a href="javascript: void(0);"><span>Reports</span></a>
+
+					    	<ul>
+					    		<li> <a href="accuen-trader/reports.html"> <span>Statistics</span> </a> </li>
+					    							    	</ul>
+
+					    </li>
+					    					    <li class="active has-sub"><a href="javascript: void(0);"><span>Administration</span></a>
+							<ul>
+					        	<li><a href="accuen-trader/createUsers.html"><span>Create Users</span></a></li>
+					        	<li><a href="accuen-trader/editUsers.html"><span>Edit Users</span></a></li>
+					        	<li><a href="accuen-trader/agencies.html"><span>Agencies</span></a></li>
+					        						        	<li><a href="accuen-trader/strategy.html"><span>Strategy Templates</span></a></li>
+					        	<li class="last"><a href="accuen-trader/targeting.html"><span>Targeting Templates</span></a></li>
+					        </ul>
+					    </li>
+					    					    <li class="last"><a href="accuen-trader/login.html">Logout</a></li>
+					</ul>
+				</div>
+			</div>
+				</div>
+</div>
+<div class="breadcrumb">
+	<div class="container960">
+		<img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/user.png"/><h1>Agencies</h1><div class="search_field"><form action="" method="post" id="search"><input type="text" value="" placeholder="search" id="search_criteria"/></form></div>	</div>
+</div>
+<div class="container960">
+	<div id="dialog-ajax" title="Loading" style="display: none; text-align: center; background-color: #38617f;">
+		<div id="ajax_loader" style="float:left; width: 45%; margin: 65px 0 0 0px;">
+		    <!-- <img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/ajax_loader.gif" /> -->
+	    </div>
+	    <div style="float: left; margin: 50px 0px 0px 0px; color: #69889f; font-size: 22px;">
+	    	Loading
+		</div>
+	</div>
+<script>
+
+function update_third_party(third_party_id)
+{	
+	$.ajax({
+	    url: "http://open.mediamath.com/demo/tradingdesk/admin/third_party_ajax_update",
+	    type: "post",
+	    dataType: "json",
+	    data: { third_party_id: third_party_id,
+	    		t1_agency_id: $('#' + third_party_id + '_t1_agency_id').val(),
+	    		third_party_name: $('#' + third_party_id + '_third_party_name').val()
+	    		}
+	}).done(function(data) {
+	   	if (!data.success)
+	   	{
+	   		alert(data.error);
+	   	}
+	   	else
+	   	{
+	   		$("#" + third_party_id + "_third_party_row").effect( "highlight", {color:"#00CA00"}, 1000 );
+	   	}
+	});
+	return true;
+}
+
+function delete_third_party(third_party_id, third_party_name)
+{
+	$("#dialog-message").html('Are you sure you want to delete "' + third_party_name + '"?<p>The agency will be disabled in TerminalOne, which stops it\'s campaigns.</p><p>Users will still be able to login for historical reports only.</p><p>This action is not reversible.</p>');
+	$("#dialog-confirm" ).dialog({
+      	resizable: false,
+      	height: 'auto',
+      	width: 'auto',
+      	modal: true,
+      	buttons: {
+	        "Delete": function()
+	        {
+	        	$.ajax({
+			    url: "http://open.mediamath.com/demo/tradingdesk/admin/third_party_ajax_delete",
+			    type: "post",
+			    dataType: "json",
+			    data: { third_party_id: third_party_id,
+			    		t1_agency_id: $('#' + third_party_id + '_t1_agency_id').val(),
+	    				third_party_name: $('#' + third_party_id + '_third_party_name').val()
+	    				}
+				}).done(function(data) {
+				   if (data.success)
+				   {
+				   		location.reload();
+				   }
+				   else
+				   {
+				   		alert('An error occurred: ' + data.error);	
+				   }
+				});
+	          	$(this).dialog("close");
+	        },
+	        Cancel: function()
+	        {
+	          	$(this).dialog("close");
+	        }
+      	}
+    });
+}
+
+function create_third_party()
+{
+	$.ajax({
+	    url: "http://open.mediamath.com/demo/tradingdesk/admin/third_party_ajax_create",
+	    type: "post",
+	    dataType: "json",
+	    data: { third_party_name: $('#create_third_party').val()}
+	}).done(function(data) {
+	   	if (!data.success)
+	   	{
+	   		alert('Error creating third party.');
+	   	}
+	   	else
+	   	{
+	   		window.location = 'http://open.mediamath.com/demo/tradingdesk//admin/third_parties/0/0';
+	   	}
+	});
+}
+
+$(document).ready(function(){
+
+	$('#search').submit(function(){
+		event.preventDefault();
+		var search = encodeURIComponent($('#search_criteria').val());
+		if (search.length == 0){search = '0';}
+		window.location = 'http://open.mediamath.com/demo/tradingdesk//admin/third_parties/0/' + search;
+	});
+});
+
+</script>
+<div id="dialog-confirm" title="Confirm" style="display: none;">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span><span id="dialog-message"></span></p>
+</div>
+<div class="container960">
+	<div class="">
+		<div class=" sectionbox">
+		<!--<div style="float:right"><a href="javascript: void(0);">Sync with T1</a></div>-->
+			
+			<table id="third_party_table">
+				<thead>
+					<tr>
+						<th>Agency Name<span class="circle_border"></span></th>
+						<th>Users<span class="circle_border"></span></th>
+						<th colspan="2">&nbsp;<span class="circle_border"></span></th>
+					</tr>
+				</thead>
+				<tbody>
+				<tr class="data_row">
+					<td>
+						<input id="create_third_party" type="text" style="width:100%;" />
+					</td>
+					<td></td>
+					<td style="text-align: center;">
+						<input type="submit" onclick="javascript: create_third_party();" value="Add New"  />
+					</td>
+				</tr>
+				<input id="85_t1_agency_id" type="hidden" value="103035" /><tr class="data_row" id="85_third_party_row"><td><input id="85_third_party_name" type="text" value="Demo Agency" " /></td><td align="center">2</td><td align="center"><img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/save.png" onclick="update_third_party(85);" style="cursor: pointer;" /><img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/trash.png" onclick="delete_third_party(85, 'Demo Agency');" style="cursor: pointer;" /></td></tr>
+<input id="88_t1_agency_id" type="hidden" value="103442" /><tr class="data_row" id="88_third_party_row"><td><input id="88_third_party_name" type="text" value="baker" " /></td><td align="center">1</td><td align="center"><img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/save.png" onclick="update_third_party(88);" style="cursor: pointer;" /><img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/trash.png" onclick="delete_third_party(88, 'baker');" style="cursor: pointer;" /></td></tr>
+<input id="87_t1_agency_id" type="hidden" value="103441" /><tr class="data_row" id="87_third_party_row"><td><input id="87_third_party_name" type="text" value="baker2" " /></td><td align="center">0</td><td align="center"><img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/save.png" onclick="update_third_party(87);" style="cursor: pointer;" /><img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/trash.png" onclick="delete_third_party(87, 'baker2');" style="cursor: pointer;" /></td></tr>
+<input id="86_t1_agency_id" type="hidden" value="103063" /><tr class="data_row" id="86_third_party_row"><td><input id="86_third_party_name" type="text" value="lalala" " /></td><td align="center">0</td><td align="center"><img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/save.png" onclick="update_third_party(86);" style="cursor: pointer;" /><img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/trash.png" onclick="delete_third_party(86, 'lalala');" style="cursor: pointer;" /></td></tr>
+				<tr class="pagination">
+					<td colspan="2" style="line-height: 2.5em;">Displaying 1 to 4 of 4</td>
+					<td align="right">
+					Prev | Next					</td>
+				</tr>
+
+								</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+		</div>
+	</body>
+</html>

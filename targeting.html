@@ -1,0 +1,938 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<base href="/">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Trading Desk</title>
+	<meta name="description" content="" />
+	<link rel="shortcut icon" href="#" />
+	<link href='http://fonts.googleapis.com/css?family=Alegreya+Sans' rel='stylesheet' type='text/css'> 
+	<meta name="viewport" content="width=device-width"/>
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery-1.11.0.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery.placeholder.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery-ui-1.10.3.min.js"></script>
+	<script rel="stylesheet" href="http://open.mediamath.com/demo/tradingdesk/assets/_js/jqueryui/custom/jquery-ui-1.10.4.custom.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/jquery-ui-1.10.4.custom.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/spin.min.js"></script>
+	<script src="http://open.mediamath.com/demo/tradingdesk/assets/_js/chosen/chosen.jquery.min.js"></script>
+	<script src="http://code.highcharts.com/highcharts.js"></script>
+	<script src="http://code.highcharts.com/highcharts-more.js"></script>
+	<!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<link rel="stylesheet" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/bootstrap.css" />
+	<link rel="stylesheet" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/jquery.selectBoxIt.css" />
+	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/jqueryui/custom/jquery-ui-1.10.4.custom.css" />
+	<link rel="stylesheet" type="text/css" href="accuen-trader/common.css"/>
+	<link rel="stylesheet" type="text/css" href="accuen-trader/demo.css"/>
+	<link rel="stylesheet" type="text/css" href="accuen-trader/menu.css" />
+	<!-- <link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/common.css"/>
+	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/demo.css"/>
+	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/menu.css" /> -->
+  	<link rel="stylesheet" type="text/css" href="http://open.mediamath.com/demo/tradingdesk/assets/_css/chosen/chosen.min.css">
+</head>
+<script>
+$(document).ready(function(){
+	var config = {
+      '.chosen-select'  : {width: '100%', disable_search_threshold:10},
+      '.chosen-select-deselect'  : {allow_single_deselect:true},
+      '.chosen-select-no-single' : {disable_search_threshold:10},
+      '.chosen-select-campaign-no-results': {no_results_text:'nothing found.'}
+    }
+
+    for (var selector in config)
+    {
+    	$(selector).chosen(config[selector]);
+    }
+
+    $( "input.datepicker" ).datepicker({dateFormat: 'd/m/yy'});
+
+
+	$('input, textarea').placeholder();
+
+	$('#search').submit(function(){
+		event.preventDefault();
+		var search = encodeURIComponent($('#search_criteria').val());
+		if (search.length == 0){search = '0';}
+
+		var current_url = 'http://open.mediamath.com/demo/tradingdesk/strategies/targetting_templates';
+		var parts = current_url.split('/');
+		var length = parts.length;
+		var new_url = current_url.replace(parts[length-2]+'/'+parts[length-1],'');
+		window.location = new_url + '0/' + search.replace("'",'%27'); 
+	});
+
+	$('textarea#targetting').bind({
+		focus: function(){
+			$(this).animate({
+				width: "300px",
+				height: "110px"
+			});
+		},
+		focusout: function(){
+			$(this).animate({
+				width: "186px",
+				height: "64px"
+			});
+		}
+	});
+
+	$('textarea#ad_server_tags').bind({
+		focus: function(){
+			$(this).animate({
+				width: "500px",
+				height: "250px"
+			});
+		},
+		focusout: function(){
+			$(this).animate({
+				width: "186px",
+				height: "64px"
+			});
+		}
+	});
+
+});
+
+var first_load = true;
+function show_ajax_loader(show)
+{		
+		var opts = {
+		  lines: 10, // The number of lines to draw
+		  length: 0, // The length of each line
+		  width: 5, // The line thickness
+		  radius: 13, // The radius of the inner circle
+		  corners: 1, // Corner roundness (0..1)
+		  rotate: 0, // The rotation offset
+		  direction: 1, // 1: clockwise, -1: counterclockwise
+		  color: '#fff', // #rgb or #rrggbb or array of colors
+		  speed: 0.8, // Rounds per second
+		  trail: 15, // Afterglow percentage
+		  shadow: false, // Whether to render a shadow
+		  hwaccel: false, // Whether to use hardware acceleration
+		  className: 'spinner', // The CSS class to assign to the spinner
+		  zIndex: 2e9, // The z-index (defaults to 2000000000)
+		  top: '120', // Top position relative to parent in px
+		  left: '50px' // Left position relative to parent in px
+		};
+		
+		var target = document.getElementById('ajax_loader');
+		
+	if (show)
+	{
+		if(first_load){var spinner = new Spinner(opts).spin(target); first_load=false;}
+		else{spinner;}
+
+		$("#dialog-ajax").dialog({
+	      	modal: true,
+	      	closeOnEscape: false,
+	      	draggable: false,
+	      	dialogClass: 'ajax-loading',
+			width: 250,
+			height: 150,
+			resizable: false
+	    });
+	}
+	else
+	{
+		$("#dialog-ajax").dialog('close');
+	}
+}
+
+
+
+
+</script>
+
+<div id="top_heading">
+	<div class="container960">
+			<!-- <div class="" id="logoHead">
+			</div> -->
+
+			<img id="accuen-logo" src="http://www.visualdna.com/wp-content/uploads/2014/09/ACCUEN_logo_big1.png">			
+			<div class="" id="userType">
+				<div id="cssmenu">
+					<ul>
+					    <li class=""><a href="accuen-trader/traders.html"><span>Home</span></a></li>
+					    <li class="has-sub"><a href="javascript: void(0);"><span>Campaigns</span></a>
+					        <ul>
+					        						        	<li><a href="accuen-trader/pending.html"><span>Pending</span></a></li>
+					        	<li><a href="accuen-trader/accepted.html"><span>Accepted</span></a></li>
+					        	<li class="last"><a href="accuen-trader/rejected.html"><span>Rejected</span></a></li>
+					        </ul>
+					   	</li>
+					    <li class="">
+					    	<a href="javascript: void(0);"><span>Reports</span></a>
+
+					    	<ul>
+					    		<li> <a href="accuen-trader/reports.html"> <span>Statistics</span> </a> </li>
+					    							    	</ul>
+
+					    </li>
+					    					    <li class="has-sub"><a href="javascript: void(0);"><span>Administration</span></a>
+							<ul>
+					        	<li><a href="accuen-trader/createUsers.html"><span>Create Users</span></a></li>
+					        	<li><a href="accuen-trader/editUsers.html"><span>Edit Users</span></a></li>
+					        	<li><a href="accuen-trader/agencies.html"><span>Agencies</span></a></li>
+					        						        	<li><a href="accuen-trader/strategy.html"><span>Strategy Templates</span></a></li>
+					        	<li class="last"><a href="accuen-trader/targeting.html"><span>Targeting Templates</span></a></li>
+					        </ul>
+					    </li>
+					    					    <li class="last"><a href="accuen-trader/login.html">Logout</a></li>
+					</ul>
+				</div>
+			</div>
+				</div>
+</div>
+<div class="breadcrumb">
+	<div class="container960">
+		<img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/pendingCampaign.png"/><h1>Targeting Templates</h1>	</div>
+</div>
+<div class="container960">
+	<div id="dialog-ajax" title="Loading" style="display: none; text-align: center; background-color: #38617f;">
+		<div id="ajax_loader" style="float:left; width: 45%; margin: 65px 0 0 0px;">
+		    <!-- <img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/ajax_loader.gif" /> -->
+	    </div>
+	    <div style="float: left; margin: 50px 0px 0px 0px; color: #69889f; font-size: 22px;">
+	    	Loading
+		</div>
+	</div>
+<script>
+var template_settings = new Object();
+var setting_labels = new Object();
+var audience_labels = new Object();
+var i = 0;
+
+$(document).ready(function() {
+
+	$("#tabs").tabs({
+		load: function(event, ui){}
+	});
+
+	$('#targetting_template_id').change(function(){
+
+		$('.template_row_active').removeClass('template_row_active').addClass('template_row_inactive');
+		$('.targetting_content, .audience_segments').empty();
+		$('.ajax_has_loaded').removeClass('ajax_has_loaded');
+		template_settings = {};
+		setting_labels = {};
+		if ($(this).val() > 0)
+		{
+		 	show_ajax_loader(true);	
+
+		 	$('.targetting_selected_items div').remove();
+		 	$('.targetting_select_header').hide();
+
+			$.ajax({
+				url: "http://open.mediamath.com/demo/tradingdesk/strategies/ajax_get_targetting_template/" + $(this).val(),
+			    type: "get",
+			    dataType: "json",
+			    async: true
+			}).done(function(data){
+				// set AND/OR switches to default to OR
+				$('#AUDS_OR, #CHNL_OR').prop('checked', true);
+
+				if (data.success)
+				{
+					setting_labels = data.setting_labels;
+
+					$.each(data.template_settings, function(key, value){
+						
+						$('#' + value.code + '_' + value.operation).prop('checked', true);
+
+						template_settings[value.code + value.value_id] = {id: value.value_id, code: value.code, operation: value.operation, restriction: value.restriction};
+						update_selected_list(value.code, value.value_id, value.restriction, 'add');
+					});					
+				}
+				show_ajax_loader(false);
+			});
+
+			$('#tabs, #selected_parent, #edit_targetting_template').show();
+		}
+		else
+		{
+			$('#tabs, #selected_parent, #edit_targetting_template').hide();
+		}
+
+	});
+
+});
+
+function save_template()
+{
+	$.ajax({
+	    url: "http://open.mediamath.com/demo/tradingdesk/strategies/ajax_save_targetting_template",
+	    type: "post",
+	    dataType: "json",
+	    data: {
+	    	targetting_template_id: $('#targetting_template_id option:selected').val(),
+	    	audience_segments_switch: $('input[name=audience_segments_switch]').val(),
+	    	template_settings: JSON.stringify(template_settings),
+	    	setting_labels: JSON.stringify(setting_labels)
+	    }
+	}).done(function(data){
+		if (data.success)
+		{
+			$('#green_tick').show().fadeOut(2000);
+		}
+		else
+		{
+			$('#errors').empty();
+	 		$.each(data.errors, function(field, error){
+	 			$('#errors').append(error + '<br />');
+	 		});
+
+	 		$( "#dialog-message" ).dialog({
+		      	modal: true,
+    			width:'auto',
+		      	buttons: {
+		        	Ok: function() {
+		        		$( this ).dialog( "close" );
+		        	}
+		      	}
+		    });
+		}
+	});
+}
+
+
+function get_target_dimension(dimension, parent, indent, async)
+{
+	if (!$('#' + dimension + '_' + parent).hasClass("ajax_has_loaded"))
+	{
+		$('#' + dimension + '_' + parent +  '_header .target_item').removeClass('template_row_inactive').addClass('template_row_loading');
+		$.ajax({
+		    url: "http://open.mediamath.com/demo/tradingdesk/strategies/ajax_get_target_values/" + dimension + "/" + parent,
+		    type: "get",
+		    dataType: "json",
+		    async: async
+		}).done(function(data){
+			if (data.target_values.entities)
+			{
+				$.each(data.target_values.entities.entity, function(key, value){
+
+					if(value.prop[3]['@attributes']['value'])
+					{
+						var name = '';
+						var child_count = 0;
+						var id = value['@attributes']['id'];
+						var restriction = false;
+
+						$.each(value.prop, function(propkey, propvalue){
+							if (propvalue['@attributes']['name'] == 'name')
+							{
+								name = propvalue['@attributes']['value'];
+							}
+							if (propvalue['@attributes']['name'] == 'child_count')
+							{
+								child_count = propvalue['@attributes']['value'];
+							}
+						});						
+						
+						if (template_settings.hasOwnProperty(dimension + id))
+						{
+							restriction = template_settings[dimension + id]['restriction'];
+						}
+
+						var item = '<div class="targetting_divider"><div style="float: left; margin-right: 12px;">';
+						if (restriction == 'INCLUDE')
+						{
+							item += '<img onclick="javascript: toggle_target(\'' + dimension + '\', ' + id + ', \'INCLUDE\', ' + parent + ');" id="incl_' + id +'" src="http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/incl_dimension_on.png" class="incl_dimension active_dimension" data-value="' + id + '" data-dimension="' + dimension + '" /> ';
+						}
+						else
+						{
+							item += '<img onclick="javascript: toggle_target(\'' + dimension + '\', ' + id + ', \'INCLUDE\', ' + parent + ');" id="incl_' + id +'" src="http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/incl_dimension_off.png" class="incl_dimension" data-value="' + id + '" data-dimension="' + dimension + '" /> ';
+						}
+
+						if (restriction == 'EXCLUDE')
+						{
+							item += '<img onclick="javascript: toggle_target(\'' + dimension + '\', ' + id + ', \'EXCLUDE\', ' + parent + ');" id="excl_' + id +'" src="http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/excl_dimension_on.png" class="excl_dimension active_dimension" data-value="' + id + '" data-dimension="' + dimension + '" />';
+						}
+						else
+						{
+							item += '<img onclick="javascript: toggle_target(\'' + dimension + '\', ' + id + ', \'EXCLUDE\', ' + parent + ');" id="excl_' + id +'" src="http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/excl_dimension_off.png" class="excl_dimension" data-value="' + id + '" data-dimension="' + dimension + '" />';
+						}
+							
+						item += '</div>';
+						// console.log('children:' + child_count);
+
+
+						item += '<div style="height: 25px; width: 100%; padding-left: ' + (indent * 15 + 10) + 'px;" id="' + dimension + '_' + id + '_header" class="targetting_header"';
+
+						if (child_count > 1)
+						{
+							item += ' onclick="get_target_dimension(\'' + dimension + '\', ' + id + ', ' + (indent + 1) + ', true);"';
+						}
+
+						item += '><div id="target_id_' + id + '" class="target_item';
+
+						if (child_count > 1)
+						{
+							item += ' template_row_inactive';
+						}
+
+						item += '">' + name + '</div></div></div>';
+						item += '<div id="' + dimension + '_' + id + '" class="targetting_content"></div>';
+
+						$('#' + dimension + '_' + parent).append(item);
+
+					}
+				});
+			}
+			
+			$('#' + dimension + '_' + parent + '_header .target_item').removeClass('template_row_loading').addClass('template_row_active');
+			$('#' + dimension + '_' + parent).addClass('ajax_has_loaded').slideDown();	
+			
+		});
+	}
+	else if ($('#' + dimension + '_' + parent).is(":visible"))
+	{
+		$('#' + dimension + '_' + parent + '_header .target_item').removeClass('template_row_active').addClass('template_row_inactive');
+		$('#' + dimension + '_' + parent).slideUp();
+		return;
+	}
+	else
+	{
+		$('#' + dimension + '_' + parent + '_header .target_item').removeClass('template_row_inactive').addClass('template_row_active');
+		$('#' + dimension + '_' + parent).slideDown();
+		return;
+	}
+}
+
+function get_audience_segment(parent, indent, async)
+{
+	if (!$('#audience_segment_' + parent).hasClass("ajax_has_loaded"))
+	{
+		$('#audience_segment_' + parent + '_header .target_item').removeClass('template_row_inactive').addClass('template_row_loading');
+		$.ajax({
+		    url: "http://open.mediamath.com/demo/tradingdesk/strategies/ajax_get_audience_segments/" + parent,
+		    type: "get",
+		    dataType: "json",
+		    async: async
+		}).done(function(data){
+			var item = '';
+				//console.log(data);
+			if (data.success)
+			{
+				$.each(data.entities, function(key, value){
+					//console.log(value);
+
+					var id = value['id'];
+					var name = value['name']; 
+					var size = value['f_uniques'] ? value['f_uniques'] : '';
+					var cpm = value['f_retail_cpm'] ? value['f_retail_cpm'] : '';
+					var restriction = false;
+					audience_labels[id] = value['full_path'];
+
+					if (template_settings.hasOwnProperty('AUDS' + id))
+					{
+						restriction = template_settings['AUDS' + id]['restriction'];
+					}
+
+					item += '<div class="targetting_divider"><div style="float: left;">';
+					if (value['buyable'] == 1)
+					{
+						if (restriction == 'INCLUDE')
+						{
+							item += '<img onclick="javascript: toggle_target(\'AUDS\', ' + id + ', \'INCLUDE\', ' + parent + ');" id="incl_' + id +'" src="http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/incl_dimension_on.png" class="incl_dimension active_dimension" data-value="' + id + '" /> ';
+						}
+						else
+						{
+							item += '<img onclick="javascript: toggle_target(\'AUDS\', ' + id + ', \'INCLUDE\', ' + parent + ');" id="incl_' + id +'" src="http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/incl_dimension_off.png" class="incl_dimension" data-value="' + id + '" /> ';
+						}
+
+						if (restriction == 'EXCLUDE')
+						{
+							item += '<img onclick="javascript: toggle_target(\'AUDS\', ' + id + ', \'EXCLUDE\', ' + parent + ');" id="excl_' + id + '" src="http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/excl_dimension_on.png" class="excl_dimension active_dimension" data-value="' + id + '" />';
+						}
+						else
+						{
+							item += '<img onclick="javascript: toggle_target(\'AUDS\', ' + id + ', \'EXCLUDE\', ' + parent + ');" id="excl_' + id + '" src="http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/excl_dimension_off.png" class="excl_dimension" data-value="' + id + '" />';
+						}
+					}
+					item += '</div><div style="height: 25px; width: 100%; padding-left: ' + (indent * 15 + 10) + 'px;" id="audience_segment_' + id + '_header"';
+
+					if (value['child_count'] > 0)
+					{
+						item += ' onclick="get_audience_segment(' + id + ', ' + (indent + 1) + ', true);"';
+					}
+
+					item += '><div class="target_item';
+
+					if (value['child_count'] > 0)
+					{
+						item += ' template_row_inactive';
+					}
+					item += '">' + name + '</div>';
+					item += '<div style="float: right; text-align: right; width: 80px;">' + cpm + '</div><div style="float: right;">' + size + '</div></div></div>';
+					item += '<div id="audience_segment_' + id + '" class="audience_segments"></div>';
+
+				});
+
+				
+				$('#audience_segment_' + parent + '_header .target_item').removeClass('template_row_loading').addClass('template_row_active');
+				$('#audience_segment_' + parent).append(item).addClass('ajax_has_loaded').slideDown();
+			}
+			else
+			{
+				alert('Failed to load audience segment from TerminalOne.');
+			}
+		});
+	}
+	else if ($('#audience_segment_' + parent).is(":visible"))
+	{
+		$('#audience_segment_' + parent + '_header .target_item').removeClass('template_row_active').addClass('template_row_inactive');
+		$('#audience_segment_' + parent).slideUp();
+		return;
+	}
+	else
+	{
+		$('#audience_segment_' + parent + '_header .target_item').removeClass('template_row_inactive').addClass('template_row_active');
+		$('#audience_segment_' + parent).slideDown();
+		return;
+	}
+}
+
+
+function toggle_target(dimension, id, restriction, parent)
+{
+	if (dimension == 'AUDS')
+	{
+		setting_labels[id] = audience_labels[id];
+	}
+	else if (typeof $('#target_id_' + parent).html() != 'undefined')
+	{
+		setting_labels[id] = $('#target_id_' + parent).html() + ' - ' + $('#target_id_' + id).html();
+	}
+	else
+	{
+		setting_labels[id] = $('#target_id_' + id).html();
+	}
+	
+	if (restriction == 'INCLUDE')
+	{
+
+		if ($('#incl_' + id).hasClass('active_dimension'))
+		{
+			$('#incl_' + id).attr("src","http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/incl_dimension_off.png").removeClass('active_dimension');
+			delete template_settings[dimension + id];
+			update_selected_list(dimension, id, restriction, 'remove');
+		}
+		else
+		{
+			$('#excl_' + id).attr("src","http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/excl_dimension_off.png").removeClass('active_dimension');
+			$('#incl_' + id).attr("src", "http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/incl_dimension_on.png").addClass('active_dimension');
+			template_settings[dimension + id] = {id: id, code: dimension, operation: 'OR', restriction: 'INCLUDE'};	
+			update_selected_list(dimension, id, restriction, 'add');
+		}
+	}
+	else
+	{
+		if ($('#excl_' + id).hasClass('active_dimension'))
+		{
+			$('#excl_' + id).attr("src","http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/excl_dimension_off.png").removeClass('active_dimension');
+			delete template_settings[dimension + id];
+			update_selected_list(dimension, id, restriction, 'remove');
+		}
+		else
+		{
+			$('#incl_' + id).attr("src","http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/incl_dimension_off.png").removeClass('active_dimension');
+			$('#excl_' + id).attr("src", "http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/excl_dimension_on.png").addClass('active_dimension');
+			template_settings[dimension + id] = {id: id, code: dimension, operation: 'OR', restriction: 'EXCLUDE'};
+			update_selected_list(dimension, id, restriction, 'add');
+		}
+	}
+}
+
+function update_selected_list(dimension, id, restriction, action)
+{
+	$('#selected_item_' + id).remove();
+
+	if (!setting_labels.hasOwnProperty(id))
+	{
+		setting_labels[id] = 'Unknown?';
+	} 
+
+	if (action == 'add')
+	{
+		var row = '<div id="selected_item_' + id + '"><img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/';
+		if (restriction == 'INCLUDE')
+		{
+			row += 'incl';
+		}
+		else
+		{
+			row += 'excl';
+		}
+		row += '_dimension_on.png" /> ' + setting_labels[id] + '</div>';
+
+		$('#' + dimension + '_selected').append(row);
+		$('#' + dimension + '_selected_header').show();
+	}
+	else if(!$('#' + dimension + '_selected div').length)
+	{
+		$('#' + dimension + '_selected_header').hide();
+	}
+}
+
+
+function create_targetting_template()
+{
+	$.ajax({
+		    url: "http://open.mediamath.com/demo/tradingdesk/strategies/ajax_create_targetting_template",
+		    type: "post",
+		    dataType: "json",
+		    data: {template_name: $('#template_name').val()}
+		}).done(function(data){
+			if(data.success)
+			{
+				$('#targetting_template_id').append('<option value="' + data.targetting_template_id + '">' + $('#template_name').val() + '</option>').val(data.targetting_template_id).trigger('change').trigger('chosen:updated');
+				$('#template_name').val('');
+			}
+			else
+			{
+				alert('Failed to create targetting template.');
+			}
+		});
+}
+
+function delete_template()
+{
+	var targetting_template_id = $('#targetting_template_id option:selected').val();
+	$("#dialog-message").html('Are you sure you want to delete "' + $('#targetting_template_id option:selected').text() + '"?<p>This will not change existing strategies but the template will no longer be selectable.</p><p>This action is not reversible.</p>');
+	$("#dialog-confirm" ).dialog({
+      	resizable: false,
+      	height: 'auto',
+      	width: 'auto',
+      	modal: true,
+      	buttons: {
+	        "Delete": function()
+	        {
+	        	$.ajax({
+				    url: "http://open.mediamath.com/demo/tradingdesk/strategies/ajax_delete_targetting_template",
+				    type: "post",
+				    dataType: "json",
+				    data: {targetting_template_id: targetting_template_id}
+				}).done(function(data){
+					if(data.success)
+					{
+						$('#targetting_template_id').val(0);
+						$('#targetting_template_id option[value="' + targetting_template_id  + '"]').remove();
+						$('#targetting_template_id').trigger('change').trigger('chosen:updated');
+					}
+					else
+					{
+						alert('Failed to delete targetting template:\n\n' + data.error);
+					}
+				});	
+
+	          	$(this).dialog("close");
+	        },
+	        Cancel: function()
+	        {
+	          	$(this).dialog("close");
+	        }
+      	}
+    });
+}
+
+
+
+
+</script> 
+<div id="targetting_template_container">
+
+<div id="dialog-confirm" title="Confirm" style="display: none;">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span><span id="dialog-message"></span></p>
+</div>
+<br />
+<table align="left" style="margin-bottom: 50px;" id="add_targetting_template">
+<thead>
+	<tr>
+		<th>Template Name</th>
+	</tr>
+</thead>
+<tbody>
+<tr class="data_row">
+	<td>
+		<input id="template_name" type="text">
+	</td>
+	<td style="text-align: center;">
+		<button onclick="javascript: create_targetting_template();">+ Add New</button>
+	</td>
+	<td></td>
+</tr>
+<tr class="data_row">
+	<td><select name="targetting_template_id" id="targetting_template_id" class="chosen-select">
+<option value="0" selected="selected">Select a Template...</option>
+<option value="13"></option>
+<option value="15">NZ Region</option>
+<option value="16">London Region</option>
+<option value="17"></option>
+<option value="18"></option>
+<option value="19"></option>
+<option value="20"></option>
+<option value="21"></option>
+<option value="22"></option>
+<option value="23"></option>
+<option value="24"></option>
+<option value="25"></option>
+<option value="26"></option>
+</select></td>
+	<td>
+		<img src="http://open.mediamath.com/demo/tradingdesk/assets/_img/icons/tick-green.png" id="green_tick" style="display: none;">
+	</td>
+</tr>
+</tbody>
+</table>
+<br />
+<div id="tabs" class="custom_trading_tabs" style="display: none; width: 65%; float: left;">
+	<ul>
+		<li><a href="http://open.mediamath.com/demo/tradingdesk/strategies/targetting_templates#tabs-1">Audience</a></li>
+		<li><a href="http://open.mediamath.com/demo/tradingdesk/strategies/targetting_templates#tabs-2">Contextual</a></li>
+		<!--<li><a href="http://open.mediamath.com/demo/tradingdesk/strategies/targetting_templates#tabs-3">Site List</a></li>-->
+		<li><a href="http://open.mediamath.com/demo/tradingdesk/strategies/targetting_templates#tabs-4">Location</a></li>
+		<li><a href="http://open.mediamath.com/demo/tradingdesk/strategies/targetting_templates#tabs-5">Technology</a></li>
+	</ul>
+	<div id="tab_info_container">
+		<div id="tabs-1" class="tab_info">
+			<!-- <div style="float: right; text-align: right; width: 80px; padding-top: 3px;">CPM</div><div style="float: right; text-align: right; width: 80px; padding-top: 3px;">Size</div> -->
+			<div class="and_or">
+				<input type="radio" name="audience_segments_switch" value="AND" id="AUDS_AND"><label for="AUDS_AND">AND</label>
+				<input type="radio" name="audience_segments_switch" value="OR" id="AUDS_OR"><label for="AUDS_OR">OR</label>
+			</div>
+			<br />
+							<div class="targetting_divider">
+					<div id="audience_segment_89889_header" onclick="get_audience_segment(89889, 1, true);" class="targetting_header">
+						<div class="target_item template_row_inactive">Acxiom</div>
+					</div>
+				</div>
+				<div id="audience_segment_89889" class="audience_segments"></div>
+								<div class="targetting_divider">
+					<div id="audience_segment_80176_header" onclick="get_audience_segment(80176, 1, true);" class="targetting_header">
+						<div class="target_item template_row_inactive">AdAdvisor, a Neustar service</div>
+					</div>
+				</div>
+				<div id="audience_segment_80176" class="audience_segments"></div>
+								<div class="targetting_divider">
+					<div id="audience_segment_83318_header" onclick="get_audience_segment(83318, 1, true);" class="targetting_header">
+						<div class="target_item template_row_inactive">AddThis</div>
+					</div>
+				</div>
+				<div id="audience_segment_83318" class="audience_segments"></div>
+								<div class="targetting_divider">
+					<div id="audience_segment_1214647_header" onclick="get_audience_segment(1214647, 1, true);" class="targetting_header">
+						<div class="target_item template_row_inactive">ADEX</div>
+					</div>
+				</div>
+				<div id="audience_segment_1214647" class="audience_segments"></div>
+								<div class="targetting_divider">
+					<div id="audience_segment_1281114_header" onclick="get_audience_segment(1281114, 1, true);" class="targetting_header">
+						<div class="target_item template_row_inactive">BlueKai</div>
+					</div>
+				</div>
+				<div id="audience_segment_1281114" class="audience_segments"></div>
+								<div class="targetting_divider">
+					<div id="audience_segment_93012_header" onclick="get_audience_segment(93012, 1, true);" class="targetting_header">
+						<div class="target_item template_row_inactive">CrossPixel</div>
+					</div>
+				</div>
+				<div id="audience_segment_93012" class="audience_segments"></div>
+								<div class="targetting_divider">
+					<div id="audience_segment_108590_header" onclick="get_audience_segment(108590, 1, true);" class="targetting_header">
+						<div class="target_item template_row_inactive">Datalogix</div>
+					</div>
+				</div>
+				<div id="audience_segment_108590" class="audience_segments"></div>
+								<div class="targetting_divider">
+					<div id="audience_segment_93110_header" onclick="get_audience_segment(93110, 1, true);" class="targetting_header">
+						<div class="target_item template_row_inactive">Datamyx</div>
+					</div>
+				</div>
+				<div id="audience_segment_93110" class="audience_segments"></div>
+								<div class="targetting_divider">
+					<div id="audience_segment_131212_header" onclick="get_audience_segment(131212, 1, true);" class="targetting_header">
+						<div class="target_item template_row_inactive">DataXpand</div>
+					</div>
+				</div>
+				<div id="audience_segment_131212" class="audience_segments"></div>
+								<div class="targetting_divider">
+					<div id="audience_segment_72049_header" onclick="get_audience_segment(72049, 1, true);" class="targetting_header">
+						<div class="target_item template_row_inactive">Datonics</div>
+					</div>
+				</div>
+				<div id="audience_segment_72049" class="audience_segments"></div>
+								<div class="targetting_divider">
+					<div id="audience_segment_21372_header" onclick="get_audience_segment(21372, 1, true);" class="targetting_header">
+						<div class="target_item template_row_inactive">Epsilon</div>
+					</div>
+				</div>
+				<div id="audience_segment_21372" class="audience_segments"></div>
+								<div class="targetting_divider">
+					<div id="audience_segment_130489_header" onclick="get_audience_segment(130489, 1, true);" class="targetting_header">
+						<div class="target_item template_row_inactive">Exelate</div>
+					</div>
+				</div>
+				<div id="audience_segment_130489" class="audience_segments"></div>
+								<div class="targetting_divider">
+					<div id="audience_segment_27962_header" onclick="get_audience_segment(27962, 1, true);" class="targetting_header">
+						<div class="target_item template_row_inactive">Experian</div>
+					</div>
+				</div>
+				<div id="audience_segment_27962" class="audience_segments"></div>
+								<div class="targetting_divider">
+					<div id="audience_segment_1282679_header" onclick="get_audience_segment(1282679, 1, true);" class="targetting_header">
+						<div class="target_item template_row_inactive">Eyeota</div>
+					</div>
+				</div>
+				<div id="audience_segment_1282679" class="audience_segments"></div>
+								<div class="targetting_divider">
+					<div id="audience_segment_106428_header" onclick="get_audience_segment(106428, 1, true);" class="targetting_header">
+						<div class="target_item template_row_inactive">Grapeshot</div>
+					</div>
+				</div>
+				<div id="audience_segment_106428" class="audience_segments"></div>
+								<div class="targetting_divider">
+					<div id="audience_segment_126113_header" onclick="get_audience_segment(126113, 1, true);" class="targetting_header">
+						<div class="target_item template_row_inactive">I-Behavior</div>
+					</div>
+				</div>
+				<div id="audience_segment_126113" class="audience_segments"></div>
+								<div class="targetting_divider">
+					<div id="audience_segment_870391_header" onclick="get_audience_segment(870391, 1, true);" class="targetting_header">
+						<div class="target_item template_row_inactive">iCumulus</div>
+					</div>
+				</div>
+				<div id="audience_segment_870391" class="audience_segments"></div>
+								<div class="targetting_divider">
+					<div id="audience_segment_420506_header" onclick="get_audience_segment(420506, 1, true);" class="targetting_header">
+						<div class="target_item template_row_inactive">Integral Ad Science</div>
+					</div>
+				</div>
+				<div id="audience_segment_420506" class="audience_segments"></div>
+								<div class="targetting_divider">
+					<div id="audience_segment_126188_header" onclick="get_audience_segment(126188, 1, true);" class="targetting_header">
+						<div class="target_item template_row_inactive">Lotame</div>
+					</div>
+				</div>
+				<div id="audience_segment_126188" class="audience_segments"></div>
+								<div class="targetting_divider">
+					<div id="audience_segment_800007_header" onclick="get_audience_segment(800007, 1, true);" class="targetting_header">
+						<div class="target_item template_row_inactive">Navegg</div>
+					</div>
+				</div>
+				<div id="audience_segment_800007" class="audience_segments"></div>
+								<div class="targetting_divider">
+					<div id="audience_segment_131935_header" onclick="get_audience_segment(131935, 1, true);" class="targetting_header">
+						<div class="target_item template_row_inactive">Nielsen</div>
+					</div>
+				</div>
+				<div id="audience_segment_131935" class="audience_segments"></div>
+								<div class="targetting_divider">
+					<div id="audience_segment_68349_header" onclick="get_audience_segment(68349, 1, true);" class="targetting_header">
+						<div class="target_item template_row_inactive">VisualDNA</div>
+					</div>
+				</div>
+				<div id="audience_segment_68349" class="audience_segments"></div>
+								<div class="targetting_divider">
+					<div id="audience_segment_17637_header" onclick="get_audience_segment(17637, 1, true);" class="targetting_header">
+						<div class="target_item template_row_inactive">Weborama</div>
+					</div>
+				</div>
+				<div id="audience_segment_17637" class="audience_segments"></div>
+						</div>
+
+		<div id="tabs-2" class="tab_info">
+			<div style="float: right; text-align: center; width: 150px; padding-top: 13px;">CPM: <strong>US$?.??</strong></div>
+			<div class="and_or">
+				<input type="radio" name="contextual_switch" value="AND" id="CHNL_AND"><label for="CHNL_AND">AND</label>
+				<input type="radio" name="contextual_switch" value="OR" id="CHNL_OR"><label for="CHNL_OR">OR</label>
+			</div>
+			<br />
+			<div class="targetting_divider">
+				<div id="CHNL_0_header" onclick="get_target_dimension('CHNL', 0, 1, true);" class="targetting_header">
+					<div class="target_item template_row_inactive">Channels</div>
+				</div>
+			</div>
+			<div id="CHNL_0" class="targetting_content"></div>
+		</div>
+		<!--
+		<div id="tabs-3">
+			<p>Site list Targetting moved to strategy tempalte.</p>
+		</div>
+		-->
+		<div id="tabs-4" class="tab_info">
+			<div class="targetting_divider">
+				<div id="REGN_0_header" onclick="get_target_dimension('REGN', 0, 1, true);" class="targetting_header">
+					<div class="target_item template_row_inactive">Country/Region</div>
+				</div>
+			</div>
+			<div id="REGN_0" class="targetting_content"></div>
+			
+			<div class="targetting_divider">
+				<div id="DMAX_0_header" onclick="get_target_dimension('DMAX', 0, 1, true);" class="targetting_header">
+					<div class="target_item template_row_inactive">DMA/Media Market</div>
+				</div>
+			</div>
+			<div id="DMAX_0" class="targetting_content"></div>
+		</div>
+
+		<div id="tabs-5" class="tab_info">
+			<div class="targetting_divider">
+				<div id="CSPD_0_header" onclick="get_target_dimension('CSPD', 0, 1, true);" class="targetting_header">
+					<div class="target_item template_row_inactive">Connection Speed</div>
+				</div>
+			</div>
+			<div id="CSPD_0" class="targetting_content"></div>
+			
+			<div class="targetting_divider">
+				<div id="ISPX_0_header" onclick="get_target_dimension('ISPX', 0, 1, true);" class="targetting_header">
+					<div class="target_item template_row_inactive">ISP</div>
+				</div>
+			</div>
+			<div id="ISPX_0" class="targetting_content"></div>
+			
+			<div class="targetting_divider">
+				<div id="BSER_0_header" onclick="get_target_dimension('BSER', 0, 1, true);" class="targetting_header">
+					<div class="target_item template_row_inactive">Browser</div>
+				</div>
+			</div>
+			<div id="BSER_0" class="targetting_content"></div>
+
+			<div class="targetting_divider">
+				<div id="OSXX_0_header" onclick="get_target_dimension('OSXX', 0, 1, true);" class="targetting_header">
+					<div class="target_item template_row_inactive">Operating System</div>
+				</div>
+			</div>
+			<div id="OSXX_0" class="targetting_content"></div>
+		</div>
+	</div>
+</div>
+<div id="selected_parent">
+	<h4>Selected Settings</h4>
+	<div id="AUDS_selected_header" class="targetting_select_header">Audience</div>
+	<div id="AUDS_selected" class="targetting_selected_items"></div>
+	<div id="CHNL_selected_header" class="targetting_select_header">Contextual Channels</div>
+	<div id="CHNL_selected" class="targetting_selected_items"></div>
+	<div id="REGN_selected_header" class="targetting_select_header">Country/Region</div>
+	<div id="REGN_selected" class="targetting_selected_items"></div>
+	<div id="DMAX_selected_header" class="targetting_select_header">DMA/Media Market</div>
+	<div id="DMAX_selected" class="targetting_selected_items"></div>
+	<div id="CSPD_selected_header" class="targetting_select_header">Connection Speed</div>
+	<div id="CSPD_selected" class="targetting_selected_items"></div>
+	<div id="ISPX_selected_header" class="targetting_select_header">ISP</div>
+	<div id="ISPX_selected" class="targetting_selected_items"></div>
+	<div id="BSER_selected_header" class="targetting_select_header">Browser</div>
+	<div id="BSER_selected" class="targetting_selected_items"></div>
+	<div id="OSXX_selected_header" class="targetting_select_header">Operating System</div>
+	<div id="OSXX_selected" class="targetting_selected_items"></div>
+</div>
+<div class="clear"></div>
+<div id="edit_targetting_template">
+		<button onclick="javascript: delete_template();" style="margin-right: 29px;">Delete Template</button>
+		<button onclick="javascript: save_template();" >Save Changes</button>
+</div>
+<div class="clear"></div>
+</div>
+		</div>
+	</body>
+</html>
